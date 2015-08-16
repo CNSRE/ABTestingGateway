@@ -25,7 +25,7 @@ local dolog     = utils.dolog
 
 local domainName = domain_name 
 if not domainName or domainName == ngx.null 
-	or string.len(domainName) < 1 then
+    or string.len(domainName) < 1 then
         local info = ERRORINFO.PARAMETER_NONE 
         local desc = "domainName is blank and please set it in nginx.conf"
         local response = doresp(info, desc)
@@ -51,7 +51,7 @@ end
 if not policyID then
     local request_body = ngx.var.request_body
     local postData = cjson.decode(request_body)
-
+    
     if not request_body then
         -- ERRORCODE.PARAMETER_NONE
         local info = ERRORINFO.PARAMETER_NONE 
@@ -71,9 +71,9 @@ if not policyID then
         ngx.say(response)
         return
     end
-
+    
     policyID = postData.policyid
-
+    
     if not policyID then
         local info = ERRORINFO.PARAMETER_ERROR 
         local desc = "policyID is needed"
@@ -82,9 +82,9 @@ if not policyID then
         ngx.say(response)
         return
     end
-
+    
     policyID = tonumber(postData.policyid)
-
+    
     if not policyID or policyID < 0 then
         local info = ERRORINFO.PARAMETER_TYPE_ERROR 
         local desc = "policyID should be a positive Integer"
@@ -107,8 +107,8 @@ if not ok then
 end
 
 local pfunc = function()
-	local policyMod = policyModule:new(red.redis, policyLib)
-	return policyMod:get(policyID)
+    local policyMod = policyModule:new(red.redis, policyLib)
+    return policyMod:get(policyID)
 end
 
 local status, info = xpcall(pfunc, handler)
@@ -125,7 +125,7 @@ end
 local divtype = info.divtype
 local divdata = info.divdata
 if divtype == ngx.null or
-	divdata == ngx.null then
+    divdata == ngx.null then
         local err	= ERRORINFO.POLICY_BLANK_ERROR
         local desc	= 'policy NO.'..policyID
         local response  = doresp(err, desc)
@@ -135,16 +135,16 @@ if divtype == ngx.null or
 end
 
 if not divtypes[divtype] then
-	-- unsupported divtype
+    -- unsupported divtype
 end
 
 local pfunc = function()
-	local divModulename		 = table.concat({'abtesting', 'diversion', divtype}, '.')
-	local divDataKey		 = table.concat({policyLib, policyID, fields.divdata}, ':')
-	local userInfoModulename = table.concat({'abtesting', 'userinfo', divtypes[divtype]}, '.')
-
-	local runtimeMod		 = runtimeModule:new(red.redis, runtimeInfoLib) 
-	return runtimeMod:set(domainName, divModulename, divDataKey, userInfoModulename)
+    local divModulename		 = table.concat({'abtesting', 'diversion', divtype}, '.')
+    local divDataKey		 = table.concat({policyLib, policyID, fields.divdata}, ':')
+    local userInfoModulename = table.concat({'abtesting', 'userinfo', divtypes[divtype]}, '.')
+    
+    local runtimeMod		 = runtimeModule:new(red.redis, runtimeInfoLib) 
+    return runtimeMod:set(domainName, divModulename, divDataKey, userInfoModulename)
 end
 
 local status, info = xpcall(pfunc, handler)
