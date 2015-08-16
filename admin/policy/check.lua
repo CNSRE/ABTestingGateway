@@ -63,8 +63,8 @@ end
 local red = redisModule:new(redisConf)
 local ok, err = red:connectdb()
 if not ok then
-    local errinfo	= ERRORINFO.REDIS_CONNECT_ERROR
-    local response	= doresp(errinfo, err)
+    local errinfo   = ERRORINFO.REDIS_CONNECT_ERROR
+    local response  = doresp(errinfo, err)
     dolog(errinfo, err)
     ngx.say(response)
     return
