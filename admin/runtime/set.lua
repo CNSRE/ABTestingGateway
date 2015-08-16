@@ -113,10 +113,10 @@ end
 
 local status, info = xpcall(pfunc, handler)
 if not status then
-    local errinfo  = info[1]
-    local errstack = info[2] 
+    local errinfo   = info[1]
+    local errstack  = info[2] 
     local err, desc = errinfo[1], errinfo[2]
-    local response	= doresp(err, desc)
+    local response  = doresp(err, desc)
     dolog(err, desc, nil, errstack)
     ngx.say(response)
     return
@@ -139,11 +139,11 @@ if not divtypes[divtype] then
 end
 
 local pfunc = function()
-    local divModulename		 = table.concat({'abtesting', 'diversion', divtype}, '.')
-    local divDataKey		 = table.concat({policyLib, policyID, fields.divdata}, ':')
-    local userInfoModulename = table.concat({'abtesting', 'userinfo', divtypes[divtype]}, '.')
+    local divModulename     = table.concat({'abtesting', 'diversion', divtype}, '.')
+    local divDataKey        = table.concat({policyLib, policyID, fields.divdata}, ':')
+    local userInfoModulename= table.concat({'abtesting', 'userinfo', divtypes[divtype]}, '.')
     
-    local runtimeMod		 = runtimeModule:new(red.redis, runtimeInfoLib) 
+    local runtimeMod        = runtimeModule:new(red.redis, runtimeInfoLib) 
     return runtimeMod:set(domainName, divModulename, divDataKey, userInfoModulename)
 end
 
