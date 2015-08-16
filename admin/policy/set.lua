@@ -1,21 +1,21 @@
-local policyModule = require('abtesting.adapter.policy')
-local redisModule	 = require('abtesting.utils.redis')
-local systemConf	 = require('abtesting.utils.init')
-local handler		 = require('abtesting.error.handler').handler
-local utils 		 = require('abtesting.utils.utils')
-local ERRORINFO	     = require('abtesting.error.errcode').info
+local policyModule  = require('abtesting.adapter.policy')
+local redisModule   = require('abtesting.utils.redis')
+local systemConf    = require('abtesting.utils.init')
+local handler       = require('abtesting.error.handler').handler
+local utils         = require('abtesting.utils.utils')
+local ERRORINFO     = require('abtesting.error.errcode').info
 
-local cjson			 = require('cjson.safe')
-local doresp		 = utils.doresp
-local dolog			 = utils.dolog
+local cjson         = require('cjson.safe')
+local doresp        = utils.doresp
+local dolog         = utils.dolog
 
-local redisConf		 = systemConf.redisConf
-local divtypes		 = systemConf.divtypes
-local prefixConf     = systemConf.prefixConf
-local policyLib      = prefixConf.policyLibPrefix
+local redisConf     = systemConf.redisConf
+local divtypes      = systemConf.divtypes
+local prefixConf    = systemConf.prefixConf
+local policyLib     = prefixConf.policyLibPrefix
 
-local request_body = ngx.var.request_body
-local postData = cjson.decode(request_body)
+local request_body  = ngx.var.request_body
+local postData      = cjson.decode(request_body)
 
 if not request_body then
     -- ERRORCODE.PARAMETER_NONE

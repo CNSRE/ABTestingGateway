@@ -14,9 +14,9 @@ local domain_name   = prefixConf.domainname
 local divtypes      = systemConf.divtypes
 
 local fields = {}
-fields.divModulename = 'divModulename'
-fields.divDataKey = 'divDataKey'
-fields.userInfoModulename = 'userInfoModulename'
+fields.divModulename        = 'divModulename'
+fields.divDataKey           = 'divDataKey'
+fields.userInfoModulename   = 'userInfoModulename'
 
 local doresp	= utils.doresp
 local dolog		= utils.dolog

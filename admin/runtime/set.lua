@@ -7,21 +7,21 @@ local utils         = require('abtesting.utils.utils')
 local ERRORINFO     = require('abtesting.error.errcode').info
 local cjson         = require('cjson.safe')
 
-local redisConf			  = systemConf.redisConf
-local prefixConf		  = systemConf.prefixConf
-local runtimeInfoLib      = prefixConf.runtimeInfoPrefix
-local policyLib			  = prefixConf.policyLibPrefix
-local domain_name		  = prefixConf.domainname
-local divtypes			  = systemConf.divtypes
+local redisConf     = systemConf.redisConf
+local prefixConf    = systemConf.prefixConf
+local runtimeInfoLib= prefixConf.runtimeInfoPrefix
+local policyLib     = prefixConf.policyLibPrefix
+local domain_name   = prefixConf.domainname
+local divtypes      = systemConf.divtypes
 
 local separator = ':'
-local fields = {}
-fields.divtype = 'divtype'
-fields.divdata = 'divdata'
-fields.idCount = 'idCount'
+local fields    = {}
+fields.divtype  = 'divtype'
+fields.divdata  = 'divdata'
+fields.idCount  = 'idCount'
 
-local doresp		 = utils.doresp
-local dolog			 = utils.dolog
+local doresp    = utils.doresp
+local dolog     = utils.dolog
 
 local domainName = domain_name 
 if not domainName or domainName == ngx.null 

@@ -1,23 +1,23 @@
 local runtimeModule = require('abtesting.adapter.runtime')
-local policyModule = require('abtesting.adapter.policy')
-local redisModule	 = require('abtesting.utils.redis')
-local systemConf	 = require('abtesting.utils.init')
-local handler		 = require('abtesting.error.handler').handler
-local utils 		 = require('abtesting.utils.utils')
-local ERRORINFO	     = require('abtesting.error.errcode').info
+local policyModule  = require('abtesting.adapter.policy')
+local redisModule   = require('abtesting.utils.redis')
+local systemConf    = require('abtesting.utils.init')
+local handler       = require('abtesting.error.handler').handler
+local utils         = require('abtesting.utils.utils')
+local ERRORINFO     = require('abtesting.error.errcode').info
 
-local cjson = require('cjson.safe')
-local doresp	= utils.doresp
-local dolog		= utils.dolog
+local cjson         = require('cjson.safe')
+local doresp        = utils.doresp
+local dolog         = utils.dolog
 
-local redisConf = systemConf.redisConf
-local divtypes	= systemConf.divtypes
-local prefixConf = systemConf.prefixConf
-local policyLib  = prefixConf.policyLibPrefix
-local runtimeInfoLib      = prefixConf.runtimeInfoPrefix
-local domain_name		  = prefixConf.domainname
+local redisConf     = systemConf.redisConf
+local divtypes      = systemConf.divtypes
+local prefixConf    = systemConf.prefixConf
+local policyLib     = prefixConf.policyLibPrefix
+local runtimeLib= prefixConf.runtimeInfoPrefix
+local domain_name   = prefixConf.domainname
 
-local policyID	= ngx.var.arg_policyid
+local policyID      = ngx.var.arg_policyid
 
 if policyID then
 	policyID = tonumber(ngx.var.arg_policyid)
@@ -90,7 +90,7 @@ end
 
 
 local pfunc = function()
-	local runtimeMod = runtimeModule:new(red.redis, runtimeInfoLib) 
+	local runtimeMod = runtimeModule:new(red.redis, runtimeLib) 
 	return runtimeMod:get(domain_name)
 end
 

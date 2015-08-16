@@ -1,20 +1,20 @@
-local runtimeModule		  = require('abtesting.adapter.runtime')
-local redisModule		  = require('abtesting.utils.redis')
-local systemConf		  = require('abtesting.utils.init')
-local handler			  = require('abtesting.error.handler').handler
-local utils 			  = require('abtesting.utils.utils')
-local ERRORINFO	    	  = require('abtesting.error.errcode').info
-local cjson				  = require('cjson.safe')
+local runtimeModule = require('abtesting.adapter.runtime')
+local redisModule   = require('abtesting.utils.redis')
+local systemConf    = require('abtesting.utils.init')
+local handler       = require('abtesting.error.handler').handler
+local utils         = require('abtesting.utils.utils')
+local ERRORINFO     = require('abtesting.error.errcode').info
+local cjson         = require('cjson.safe')
 
-local redisConf			  = systemConf.redisConf
-local prefixConf		  = systemConf.prefixConf
-local runtimeInfoLib      = prefixConf.runtimeInfoPrefix
-local policyLib			  = prefixConf.policyLibPrefix
-local domain_name		  = prefixConf.domainname
-local divtypes			  = systemConf.divtypes
+local redisConf     = systemConf.redisConf
+local prefixConf    = systemConf.prefixConf
+local runtimeInfoLib= prefixConf.runtimeInfoPrefix
+local policyLib     = prefixConf.policyLibPrefix
+local domain_name   = prefixConf.domainname
+local divtypes      = systemConf.divtypes
 
-local doresp	= utils.doresp
-local dolog		= utils.dolog
+local doresp        = utils.doresp
+local dolog         = utils.dolog
 
 local domainName = domain_name or ngx.var.arg_domainname 
 if not domainName then

@@ -1,21 +1,20 @@
-local policyModule	 = require('abtesting.adapter.policy')
-local redisModule	 = require('abtesting.utils.redis')
-local systemConf	 = require('abtesting.utils.init')
-local handler		 = require('abtesting.error.handler').handler
-local utils 		 = require('abtesting.utils.utils')
-local ERRORINFO	     = require('abtesting.error.errcode').info
+local policyModule  = require('abtesting.adapter.policy')
+local redisModule   = require('abtesting.utils.redis')
+local systemConf    = require('abtesting.utils.init')
+local handler       = require('abtesting.error.handler').handler
+local utils         = require('abtesting.utils.utils')
+local ERRORINFO     = require('abtesting.error.errcode').info
+local cjson         = require('cjson.safe')
 
-local cjson = require('cjson.safe')
+local redisConf     = systemConf.redisConf
+local divtypes      = systemConf.divtypes
+local prefixConf    = systemConf.prefixConf
+local policyLib     = prefixConf.policyLibPrefix
 
-local redisConf = systemConf.redisConf
-local divtypes	= systemConf.divtypes
-local prefixConf = systemConf.prefixConf
-local policyLib  = prefixConf.policyLibPrefix
+local doresp        = utils.doresp
+local dolog         = utils.dolog
 
-local doresp	= utils.doresp
-local dolog		= utils.dolog
-
-local policyID	= ngx.var.arg_policyid
+local policyID      = ngx.var.arg_policyid
 
 if policyID then
 	policyID = tonumber(ngx.var.arg_policyid)
