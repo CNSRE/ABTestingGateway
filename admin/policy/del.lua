@@ -105,9 +105,9 @@ if not status then
     return
 end
 
-local divModname		= info[1]
-local divPolicy			= info[2]
-local userInfoModname	= info[3]
+local divModname        = info[1]
+local divPolicy         = info[2]
+local userInfoModname   = info[3]
 
 if divPolicy and divPolicy ~= ngx.null then
     local s, e = string.find(divPolicy, policyLib)

@@ -23,17 +23,17 @@ _M.new = function(self, database, baseLibrary)
     if not database then
         error{ERRORINFO.PARAMETER_NONE, 'need avaliable redis db'}
     end
-	if not baseLibrary then
+    if not baseLibrary then
         error{ERRORINFO.PARAMETER_NONE, 'need avaliable policy baselib'}
     end
-
+    
     self.database     = database
     self.baseLibrary  = baseLibrary
     self.idCountKey = table.concat({baseLibrary, fields.idCount}, separator)
-
+    
     local ok, err = database:exists(self.idCountKey)
     if not ok then error{ERRORINFO.REDIS_ERROR,  err} end
-
+    
     if 0 == ok then
         local ok, err = database:set(self.idCountKey, '-1')
         if not ok then error{ERRORINFO.REDIS_ERROR, err} end
@@ -49,7 +49,7 @@ _M.getIdCount = function(self)
     local key = self.idCountKey
     local idCount, err = database:incr(key)
     if not idCount then error{ERRORINFO.REDIS_ERROR, err} end
-
+    
     return idCount
 end
 
@@ -75,7 +75,7 @@ _M._setDivdata = function(self, id, divdata, modulename)
     local divModule = require(modulename)
     local database = self.database
     local key = table.concat({self.baseLibrary, id, fields.divdata}, separator)
-
+    
     divModule:new(database, key):set(divdata)
 end
 
@@ -87,18 +87,18 @@ _M.set = function(self, policy)
     local id = self:getIdCount()
     local database = self.database
     local divModulename = table.concat({'abtesting', 'diversion', policy.divtype}, '.')
-
+    
     self:_setDivtype(id, policy.divtype)
     self:_setDivdata(id, policy.divdata, divModulename)
-
-	return id
+    
+    return id
 end
 
 _M.check = function(self, policy)
     local divModulename = table.concat({'abtesting', 'diversion', policy.divtype}, '.')
     local divModule = require(divModulename)
     local database = self.database
-
+    
     return divModule:new(database, ''):check(policy.divdata)
 end
 
