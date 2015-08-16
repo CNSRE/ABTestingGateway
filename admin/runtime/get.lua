@@ -24,56 +24,56 @@ local dolog		= utils.dolog
 local domainName = domain_name or ngx.var.arg_domainname 
 
 if not domainName then
-	local request_body = ngx.var.request_body
-	local postData = cjson.decode(request_body)
+    local request_body = ngx.var.request_body
+    local postData = cjson.decode(request_body)
+    
+    if not request_body then
+    	-- ERRORCODE.PARAMETER_NONE
+    	local info = ERRORINFO.PARAMETER_NONE 
+    	local desc = 'request_body or post data'
+    	local response = doresp(info, desc)
+    	dolog(info, desc)
+    	ngx.say(response)
+    	return
+    end
+    
+    if not postData then
+        -- ERRORCODE.PARAMETER_ERROR
+        local info = ERRORINFO.PARAMETER_ERROR 
+        local desc = 'postData is not a json string'
+        local response = doresp(info, desc)
+        dolog(info, desc)
+        ngx.say(response)
+        return
+    end
 
-	if not request_body then
-		-- ERRORCODE.PARAMETER_NONE
-		local info = ERRORINFO.PARAMETER_NONE 
-		local desc = 'request_body or post data'
-		local response = doresp(info, desc)
-		dolog(info, desc)
-		ngx.say(response)
-		return
-	end
-
-	if not postData then
-		-- ERRORCODE.PARAMETER_ERROR
-		local info = ERRORINFO.PARAMETER_ERROR 
-		local desc = 'postData is not a json string'
-		local response = doresp(info, desc)
-		dolog(info, desc)
-		ngx.say(response)
-		return
-	end
-
-	if not domainName then
-		domainName = postData.domainname
-		if not domainName then
-			local info = ERRORINFO.PARAMETER_NONE
-			local desc = "domainName"
-			local response = doresp(info, desc)
-			dolog(info, desc)
-			ngx.say(response)
-			return
-		end
-	end
+    if not domainName then
+        domainName = postData.domainname
+        if not domainName then
+            local info = ERRORINFO.PARAMETER_NONE
+            local desc = "domainName"
+            local response = doresp(info, desc)
+            dolog(info, desc)
+            ngx.say(response)
+            return
+        end
+    end
 end
 
 
 local red = redisModule:new(redisConf)
 local ok, err = red:connectdb()
 if not ok then
-	local errinfo	= ERRORINFO.REDIS_CONNECT_ERROR
-	local response	= doresp(errinfo, err)
-	dolog(errinfo, err)
-	ngx.say(response)
-	return
+    local errinfo	= ERRORINFO.REDIS_CONNECT_ERROR
+    local response	= doresp(errinfo, err)
+    dolog(errinfo, err)
+    ngx.say(response)
+    return
 end
 
 local pfunc = function()
-	local runtimeMod = runtimeModule:new(red.redis, runtimeInfoLib) 
-	return runtimeMod:get(domainName)
+    local runtimeMod = runtimeModule:new(red.redis, runtimeInfoLib) 
+    return runtimeMod:get(domainName)
 end
 
 local status, info = xpcall(pfunc, handler)
