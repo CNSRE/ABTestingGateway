@@ -194,11 +194,11 @@ if not ok then
 end
 
 if not userInfo then
-	local errinfo = ERRORINFO.USERINFO_BLANK_ERROR
-	local errdesc = userInfoModulename
-	dolog(errinfo, errdesc, getRewriteInfo())
-	if red then setKeepalive(red) end
-	return
+    local errinfo = ERRORINFO.USERINFO_BLANK_ERROR
+    local errdesc = userInfoModulename
+    dolog(errinfo, errdesc, getRewriteInfo())
+    if red then setKeepalive(red) end
+    return
 end
 ------------------分流准备工作结束--------------------
 --====================================================
