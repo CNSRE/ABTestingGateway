@@ -117,7 +117,7 @@ end
 
 local data
 if info then
-	data = ' the id of new policy is '..info
+    data = ' the id of new policy is '..info
 end
 
 local response = doresp(ERRORINFO.SUCCESS, data)

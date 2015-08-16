@@ -22,7 +22,7 @@ if not request_body then
     local errinfo	 = ERRORINFO.PARAMETER_NONE
     local desc		 = 'request_body or post data'
     local response	 = doresp(errinfo, desc)
-	dolog(errinfo, desc)
+    dolog(errinfo, desc)
     ngx.say(response)
     return
 end
@@ -32,7 +32,7 @@ if not postData then
     local errinfo	= ERRORINFO.PARAMETER_ERROR 
     local desc		= 'postData is not a json string'
     local response	= doresp(errinfo, desc)
-	dolog(errinfo, desc)
+    dolog(errinfo, desc)
     ngx.say(response)
     return
 end
@@ -45,7 +45,7 @@ if not divtype or not divdata then
     local errinfo	= ERRORINFO.PARAMETER_NONE 
     local desc		= "policy divtype or policy divdata"
     local response	= doresp(errinfo, desc)
-	dolog(errinfo, desc)
+    dolog(errinfo, desc)
     ngx.say(response)
     return
 end
@@ -55,7 +55,7 @@ if not divtypes[divtype] then
     local errinfo	= ERRORINFO.PARAMETER_TYPE_ERROR 
     local desc		= "unsupported divtype"
     local response	= doresp(errinfo, desc)
-	dolog(errinfo, desc)
+    dolog(errinfo, desc)
     ngx.say(response)
     return
 end
@@ -65,24 +65,24 @@ local ok, err = red:connectdb()
 if not ok then
     local errinfo	= ERRORINFO.REDIS_CONNECT_ERROR
     local response	= doresp(errinfo, err)
-	dolog(errinfo, err)
+    dolog(errinfo, err)
     ngx.say(response)
     return
 end
 
 local pfunc = function() 
-	local policyMod = policyModule:new(red.redis, policyLib)
-	local policy   = postData
-	return policyMod:check(policy)
+    local policyMod = policyModule:new(red.redis, policyLib)
+    local policy   = postData
+    return policyMod:check(policy)
 end
 
 local status, info = xpcall(pfunc, handler)
 if not status then
-	local errinfo  = info[1]
-	local errstack = info[2] 
+    local errinfo  = info[1]
+    local errstack = info[2] 
     local err, desc = errinfo[1], errinfo[2]
     local response	= doresp(err, desc)
-	dolog(err, desc, nil, errstack)
+    dolog(err, desc, nil, errstack)
     ngx.say(response)
     return
 end
@@ -94,10 +94,10 @@ local desc	   = checkout[3]
 
 local response
 if not valid then
-	dolog(err, desc)
+    dolog(err, desc)
     response = doresp(err, desc)
 else
-	response = doresp(ERRORINFO.SUCCESS)
+    response = doresp(ERRORINFO.SUCCESS)
 end
 ngx.say(response)
 
