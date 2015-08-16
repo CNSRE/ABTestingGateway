@@ -78,24 +78,23 @@ end
 
 local status, info = xpcall(pfunc, handler)
 if not status then
-	local errinfo  = info[1]
-	local errstack = info[2] 
+    local errinfo  = info[1]
+    local errstack = info[2] 
     local err, desc = errinfo[1], errinfo[2]
     local response	= doresp(err, desc)
-	dolog(err, desc, nil, errstack)
+    dolog(err, desc, nil, errstack)
     ngx.say(response)
     return
-
 else
-	divModulename	 = fields.divModulename 
-	divDataKey		 = fields.divDataKey 
-	userInfoModulename = fields.userInfoModulename 
-	local runtimeInfo = {}
-	runtimeInfo[divModulename]    = info[1]
-	runtimeInfo[divDataKey]		  = info[2]
-	runtimeInfo[userInfoModulename] = info[3]
-
-	local response = doresp(ERRORINFO.SUCCESS, nil, runtimeInfo)
-	ngx.say(response)
+    divModulename	 = fields.divModulename 
+    divDataKey		 = fields.divDataKey 
+    userInfoModulename = fields.userInfoModulename 
+    local runtimeInfo = {}
+    runtimeInfo[divModulename]    = info[1]
+    runtimeInfo[divDataKey]		  = info[2]
+    runtimeInfo[userInfoModulename] = info[3]
+    
+    local response = doresp(ERRORINFO.SUCCESS, nil, runtimeInfo)
+    ngx.say(response)
 end
 

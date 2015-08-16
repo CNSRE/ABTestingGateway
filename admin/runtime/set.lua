@@ -29,7 +29,7 @@ if not domainName or domainName == ngx.null
         local info = ERRORINFO.PARAMETER_NONE 
         local desc = "domainName is blank and please set it in nginx.conf"
         local response = doresp(info, desc)
-		dolog(info, desc)
+        dolog(info, desc)
         ngx.say(response)
         return
 end
@@ -37,12 +37,12 @@ end
 local policyID	= ngx.var.arg_policyid
 
 if policyID then
-	policyID = tonumber(ngx.var.arg_policyid)
+    policyID = tonumber(ngx.var.arg_policyid)
     if not policyID or policyID < 0 then
         local info = ERRORINFO.PARAMETER_TYPE_ERROR 
         local desc = "policyID should be a positive Integer"
         local response = doresp(info, desc)
-		dolog(info, desc)
+        dolog(info, desc)
         ngx.say(response)
         return
     end
@@ -57,7 +57,7 @@ if not policyID then
         local info = ERRORINFO.PARAMETER_NONE 
         local desc = 'request_body or post data to get policyID'
         local response = doresp(info, desc)
-		dolog(info, desc)
+        dolog(info, desc)
         ngx.say(response)
         return
     end
@@ -67,18 +67,18 @@ if not policyID then
         local info = ERRORINFO.PARAMETER_ERROR 
         local desc = 'postData is not a json string'
         local response = doresp(info, desc)
-		dolog(info, desc)
+        dolog(info, desc)
         ngx.say(response)
         return
     end
 
-	policyID = postData.policyid
+    policyID = postData.policyid
 
     if not policyID then
         local info = ERRORINFO.PARAMETER_ERROR 
         local desc = "policyID is needed"
         local response = doresp(info, desc)
-		dolog(info, desc)
+        dolog(info, desc)
         ngx.say(response)
         return
     end
@@ -89,7 +89,7 @@ if not policyID then
         local info = ERRORINFO.PARAMETER_TYPE_ERROR 
         local desc = "policyID should be a positive Integer"
         local response = doresp(info, desc)
-		dolog(info, desc)
+        dolog(info, desc)
         ngx.say(response)
         return
     end
@@ -99,11 +99,11 @@ end
 local red = redisModule:new(redisConf)
 local ok, err = red:connectdb()
 if not ok then
-	local errinfo	= ERRORINFO.REDIS_CONNECT_ERROR
-	local response	= doresp(errinfo, err)
-	dolog(errinfo, err)
-	ngx.say(response)
-	return
+    local errinfo	= ERRORINFO.REDIS_CONNECT_ERROR
+    local response	= doresp(errinfo, err)
+    dolog(errinfo, err)
+    ngx.say(response)
+    return
 end
 
 local pfunc = function()
@@ -113,26 +113,25 @@ end
 
 local status, info = xpcall(pfunc, handler)
 if not status then
-	local errinfo  = info[1]
-	local errstack = info[2] 
+    local errinfo  = info[1]
+    local errstack = info[2] 
     local err, desc = errinfo[1], errinfo[2]
     local response	= doresp(err, desc)
-	dolog(err, desc, nil, errstack)
+    dolog(err, desc, nil, errstack)
     ngx.say(response)
     return
-
 end
 
 local divtype = info.divtype
 local divdata = info.divdata
 if divtype == ngx.null or
 	divdata == ngx.null then
-	local err	= ERRORINFO.POLICY_BLANK_ERROR
-	local desc	= 'policy NO.'..policyID
-    local response  = doresp(err, desc)
-	dolog(err, desc)
-	ngx.say(response)
-	return
+        local err	= ERRORINFO.POLICY_BLANK_ERROR
+        local desc	= 'policy NO.'..policyID
+        local response  = doresp(err, desc)
+        dolog(err, desc)
+        ngx.say(response)
+        return
 end
 
 if not divtypes[divtype] then
@@ -150,11 +149,11 @@ end
 
 local status, info = xpcall(pfunc, handler)
 if not status then
-	local errinfo  = info[1]
-	local errstack = info[2] 
+    local errinfo  = info[1]
+    local errstack = info[2] 
     local err, desc = errinfo[1], errinfo[2]
     local response	= doresp(err, desc)
-	dolog(err, desc, nil, errstack)
+    dolog(err, desc, nil, errstack)
     ngx.say(response)
     return
 end
