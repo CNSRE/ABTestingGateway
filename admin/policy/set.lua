@@ -91,10 +91,10 @@ if not status then
     return
 end
 
-local checkout = info
-local valid	   = checkout[1]
-local err	   = checkout[2]
-local desc	   = checkout[3]
+local chkout    = info
+local valid     = chkout[1]
+local err       = chkout[2]
+local desc      = chkout[3]
 
 if not valid then
     dolog(err, desc)
@@ -106,10 +106,10 @@ end
 local pfunc = function() return policyMod:set(policy) end
 local status, info = xpcall(pfunc, handler)
 if not status then
-    local errinfo  = info[1]
-    local errstack = info[2] 
+    local errinfo   = info[1]
+    local errstack  = info[2] 
     local err, desc = errinfo[1], errinfo[2]
-    local response	= doresp(err, desc)
+    local response  = doresp(err, desc)
     dolog(err, desc, nil, errstack)
     ngx.say(response)
     return

@@ -29,8 +29,8 @@ if policyID then
 end
 
 if not policyID then
-    local request_body = ngx.var.request_body
-    local postData = cjson.decode(request_body)
+    local request_body  = ngx.var.request_body
+    local postData      = cjson.decode(request_body)
     
     if not request_body then
         -- ERRORCODE.PARAMETER_NONE
@@ -92,10 +92,10 @@ end
 
 local status, info = xpcall(pfunc, handler)
 if not status then
-    local errinfo  = info[1]
-    local errstack = info[2] 
+    local errinfo   = info[1]
+    local errstack  = info[2] 
     local err, desc = errinfo[1], errinfo[2]
-    local response	= doresp(err, desc)
+    local response  = doresp(err, desc)
     dolog(err, desc, nil, errstack)
     ngx.say(response)
     return

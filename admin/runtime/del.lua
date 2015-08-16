@@ -8,7 +8,7 @@ local cjson         = require('cjson.safe')
 
 local redisConf     = systemConf.redisConf
 local prefixConf    = systemConf.prefixConf
-local runtimeInfoLib= prefixConf.runtimeInfoPrefix
+local runtimeLib    = prefixConf.runtimeInfoPrefix
 local policyLib     = prefixConf.policyLibPrefix
 local domain_name   = prefixConf.domainname
 local divtypes      = systemConf.divtypes
@@ -66,7 +66,7 @@ if not ok then
 end
 
 local pfunc = function()
-    local runtimeMod = runtimeModule:new(red.redis, runtimeInfoLib) 
+    local runtimeMod = runtimeModule:new(red.redis, runtimeLib) 
     runtimeMod:del(domainName)
 end
 
@@ -75,7 +75,7 @@ if not status then
     local errinfo   = info[1]
     local errstack  = info[2] 
     local err, desc = errinfo[1], errinfo[2]
-    local response	= doresp(err, desc)
+    local response  = doresp(err, desc)
     dolog(err, desc, nil, errstack)
     ngx.say(response)
     return
