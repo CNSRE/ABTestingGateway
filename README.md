@@ -133,11 +133,6 @@ Features:
     3. /admin/runtime/del
 </pre>
 
-###管理接口：
-<pre>
-    1. /
-</pre>
-
 快速部署
 ----------
 
@@ -160,7 +155,6 @@ repo中的`utils/conf`文件夹中有灰度系统部署所需的一个最小示�
 #启动灰度系统，proxy server，灰度系统的配置也写在conf/nginx.conf中
 9. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/nginx.conf
 </pre>
-
 
 灰度系统工作示例
 --------------
@@ -208,6 +202,10 @@ repo中的`utils/conf`文件夹中有灰度系统部署所需的一个最小示�
         2. 分流，带uid为30，根据策略，转发至beta3
         0> curl 127.0.0.1:8030  -H 'X-Uid:30'
         this is beta3 server
+
+线上部署：
+-----------
+<div align="center"><img src="https://github.com/SinaMSRE/ABTestingGateway/blob/master/doc/img/deployment.png"></div>
 
 软件版本：
 -----------
