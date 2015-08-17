@@ -102,14 +102,6 @@ Features:
 
 分流过程中，首先获得系统的`运行时信息`，然后提取`用户特征`，最后`分流模块`根据`用户特征`和`分流策略`计算得出应该转发到的upstream server。
    
-
-###管理功能：
-    
-1. 分流策略管理         
-    
-2. 运行时信息管理
-
-
 ###管理功能：
 
 <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/manage.png"><p>管理功能架构图</p></div>
