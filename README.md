@@ -1,12 +1,23 @@
 基于动态策略的灰度发布系统
 ========================
 
-这是一个基于动态策略的灰度发布系统，基于ngx-lua开发，可以动态替换分流策略，实现动态调度功能。
+这是一个可以动态设置分流策略的灰度发布系统，基于ngx-lua开发，可以实现动态调度功能。
 
+灰度发布系统的主要功能是实现用户请求的分流转发，工作在7层，根据用户请求特征，如UID、IP等，将请求转发至后端服务器，实现分流。
 
-灰度发布系统的主要功能是实现用户请求的分流转发，工作在7层，根据用户请求特征，如UID、IP等，将请求转发至upstream server，实现分流。nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；灰度发布系统的主要工作是在nginx转发的框架内，在转向upstream前，根据用户请求特征和分流策略，计算出目标upstream进而分流。灰度系统需要灵活而高效的实现这部分逻辑，使得对原生nginx转发的影响降到最低。
+nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；灰度发布系统是在nginx转发的框架内，在转向upstream前，根据用户请求特征和分流策略，计算出目标upstream，进而实现分流。
+
+在以往的基于nginx实现的灰度系统中，分流逻辑往往通过rewrite阶段的if和rewrite指令等实现，优点是`性能较高`，缺点是`功能受限`、`容易出错`，以及`转发规则固定，只能静态分流`。
+
+针对这些缺点，我们基于[tengine](http://tengine.taobao.org/)和[ngx-lua](https://github.com/openresty/lua-nginx-module)设计实现了一个灰度发布系统，采用ngx-lua实现系统功能，采用redis作为分流策略数据库，通过启用[lua-shared-dict](http://wiki.nginx.org/HttpLuaModule#ngx.shared.DICT)和[lua-resty-lock](https://github.com/openresty/lua-resty-redis)作为系统缓存和缓存锁，系统获得了较为接近原生nginx转发的性能。
 
 <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="50%" height="50%"></div>
+
+- 系统实现了分流策略的动态即时更新，进而实现了动态调度功能。
+
+- 系统提供了策略管理接口，系统管理员通过管理接口设置分流策略，控制分流。
+
+- 系统提供了开发框架，开发者可以灵活添加新的分流方式，实现二次开发
 
 Features:
 ----------
