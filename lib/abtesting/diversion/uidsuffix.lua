@@ -1,13 +1,13 @@
 local modulename = "abtestingDiversionUidsuffix"
 
-local _M	= {}
-local mt	= { __index = _M }
+local _M    = {}
+local mt    = { __index = _M }
 _M._VERSION = "0.0.1"
 
 local ERRORINFO	= require('abtesting.error.errcode').info
 
-local k_suffix = 'suffix'
-local k_upstream = 'upstream'
+local k_suffix      = 'suffix'
+local k_upstream    = 'upstream'
 
 _M.new = function(self, database, policyLib)
     if not database then
@@ -71,22 +71,22 @@ _M.get = function(self)
 end
 
 _M.getUpstream = function(self, uid)
-	if not tonumber(uid) then
-		return nil
-	end
-
-	local suffix	= uid % 10; 
-	local database	= self.database
-	local policyLib = self.policyLib
-
-	local upstream, err = database:hget(policyLib , suffix)
-	if not upstream then error{ERRORINFO.REDIS_ERROR, err} end
-
-	if upstream == ngx.null then
-		return nil
-	else
-		return upstream
-	end
+    if not tonumber(uid) then
+        return nil
+    end
+    
+    local suffix	= uid % 10; 
+    local database	= self.database
+    local policyLib = self.policyLib
+    
+    local upstream, err = database:hget(policyLib , suffix)
+    if not upstream then error{ERRORINFO.REDIS_ERROR, err} end
+    
+    if upstream == ngx.null then
+        return nil
+    else
+        return upstream
+    end
 
 end
 
