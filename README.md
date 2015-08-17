@@ -17,21 +17,21 @@ Features:
 快速部署:
 ----------
 <pre>
-	1. git clone https://github.com/SinaMSRE/ABTestingGateway
-	2. cd /path/to/ABTestingGateway/utils
-	
-	#启动redis数据库
-	3. redis-server conf/redis.conf 
-	
-	#启动upstream server，其中stable为默认upstream
-	4. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/stable.conf
-	5. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta1.conf
-	6. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta2.conf
-	7. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta3.conf
-	8. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta4.conf
-	
-	#启动灰度系统，proxy server，灰度系统的配置也写在conf/nginx.conf中
-	9. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/nginx.conf
+    1. git clone https://github.com/SinaMSRE/ABTestingGateway
+    2. cd /path/to/ABTestingGateway/utils
+    
+    #启动redis数据库
+    3. redis-server conf/redis.conf 
+    
+    #启动upstream server，其中stable为默认upstream
+    4. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/stable.conf
+    5. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta1.conf
+    6. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta2.conf
+    7. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta3.conf
+    8. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta4.conf
+    
+    #启动灰度系统，proxy server，灰度系统的配置也写在conf/nginx.conf中
+    9. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/nginx.conf
 </pre>
 
 
@@ -40,22 +40,27 @@ Features:
 ###管理接口：
 <pre>
 [策略管理接口]
-	#分流策略检查
-	1. /admin/policy/check
-	#分流策略添加
-	2. /admin/policy/set
-	#分流策略读取
-	3. /admin/policy/get
-	#分流策略删除
-	4. /admin/policy/del
+    #分流策略检查
+    1. /admin/policy/check
+    #分流策略添加
+    2. /admin/policy/set
+    #分流策略读取
+    3. /admin/policy/get
+    #分流策略删除
+    4. /admin/policy/del
 
 [运行时管理接口]
-	#设置分流策略为运行时策略
-	1. /admin/runtime/set
-	#获取系统当前运行时信息
-	2. /admin/runtime/get
-	#删除系统运行时信息，关闭分流接口
-	3. /admin/runtime/del
+    #设置分流策略为运行时策略
+    1. /admin/runtime/set
+    #获取系统当前运行时信息
+    2. /admin/runtime/get
+    #删除系统运行时信息，关闭分流接口
+    3. /admin/runtime/del
+</pre>
+
+###分流接口：
+<pre>
+    1. /        
 </pre>
 
 接口使用:
