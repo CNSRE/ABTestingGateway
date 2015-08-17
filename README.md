@@ -1,8 +1,8 @@
 基于动态策略的灰度发布系统
 ========================
-ABTesingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于[tengine](http://tengine.taobao.org/)和[ngx-lua](https://github.com/openresty/lua-nginx-module)开发，采用[ngx-lua](https://github.com/openresty/lua-nginx-module)开发，采用 redis 作为分流策略数据库，可以实现动态调度功能。
+ABTesingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于[tengine](http://tengine.taobao.org/)，采用[ngx-lua](https://github.com/openresty/lua-nginx-module)开发，使用 redis 作为分流策略数据库，可以实现动态调度功能。
 
-nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，计算出目标upstream，进而实现分流。
+nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，查找出目标upstream，进而实现分流。
 
 在以往的基于 nginx 实现的灰度系统中，分流逻辑往往通过 rewrite 阶段的 if 和 rewrite 指令等实现，优点是`性能较高`，缺点是`功能受限`、`容易出错`，以及`转发规则固定，只能静态分流`。针对这些缺点，我们设计实现了ABTesingGateway，采用 ngx-lua 实现系统功能，通过启用[lua-shared-dict](http://wiki.nginx.org/HttpLuaModule#ngx.shared.DICT)和[lua-resty-lock](https://github.com/openresty/lua-resty-redis)作为系统缓存和缓存锁，系统获得了较为接近原生nginx转发的性能。
 
@@ -31,7 +31,7 @@ ABTesingGateway 依据系统中配置的 `运行时信息runtimeInfo` 进行分�
 如图所示
 
     - 系统管理员通过系统管理接口将`分流策略policy`设置为`运行时策略`，并指定该策略对应的 `分流模块名divModulename` 和 `用户信息提取模块名userInfoModulename` 后，系统可以进行分流工作。
-    - 系统对用户请求进行分流时，首先获得系统 `运行时信息runtimeInfo` 中的信息，然后提取 `用户特征userInfo`，最后 `分流模块divModule` 根据 `分流策略dviDataKey` 和 `用户特征userInfo` 计算得出应该转发到的upstream server。            
+    - 系统对用户请求进行分流时，首先获得系统 `运行时信息runtimeInfo` 中的信息，然后提取 `用户特征userInfo`，最后 `分流模块divModule` 根据 `分流策略dviDataKey` 和 `用户特征userInfo` 查找出应该转发到的upstream。如果没有对应的upstream，则将该请求转向默认upstream。 
 
 2. 以iprange分流为例           
         
@@ -44,9 +44,9 @@ ABTesingGateway 依据系统中配置的 `运行时信息runtimeInfo` 进行分�
                             {"range":{"start":7777, "end":8888}, "upstream":"beta3"}
                           ]
             }
-        其中divdata中的每个 range:upstream 对中，range 为 ip 段，upstream 为 ip 段对应的后端；range 中的 start 和 end 分别为 ip 段的起始和终止， ip为对应的整型。
-        当灰度系统启用iprange分流方式时，会根据用户请求的ip进行分流转发。
-        假如用户请求中的ip信息转为整型后是4000，将被转发至beta2 upstream。
+其中divdata中的每个 range:upstream 对中，range 为 ip 段，upstream 为 ip 段对应的后端；range 中的 start 和 end 分别为 ip 段的起始和终止， ip为对应的整型。
+当灰度系统启用iprange分流方式时，会根据用户请求的ip进行分流转发。
+假如用户请求中的ip信息转为整型后是4000，将被转发至beta2 upstream。
 
 3. 分流过程流程图
 <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/div_flowchart.png"><p>分流过程流程图</p></div>
@@ -92,7 +92,7 @@ ABTesingGateway 依据系统中配置的 `运行时信息runtimeInfo` 进行分�
 
 
 ###系统部署
-repo中的`utils/conf`文件夹中有灰度系统部署所需的一个最小示例
+repo中的`utils/conf`文件夹中有灰度系统部署所需的最小示例
 
 <pre>
 1. git clone https://github.com/SinaMSRE/ABTestingGateway
