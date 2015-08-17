@@ -6,6 +6,8 @@
 
 灰度发布系统的主要功能是实现用户请求的分流转发，工作在7层，根据用户请求特征，如UID、IP等，将请求转发至upstream server，实现分流。nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；灰度发布系统的主要工作是在nginx转发的框架内，在转向upstream前，根据用户请求特征和分流策略，计算出目标upstream进而分流。灰度系统需要灵活而高效的实现这部分逻辑，使得对原生nginx转发的影响降到最低。
 
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="50%" height="50%"></div>
+
 Features:
 ----------
 
