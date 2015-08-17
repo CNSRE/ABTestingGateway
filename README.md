@@ -177,9 +177,9 @@ repo中的`utils/conf`文件夹中有灰度系统部署所需的最小示例
 压测结果：
 -----------
 
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/%E5%B8%A6cache%E6%80%A7%E8%83%BD.png"><p>压测环境下灰度系统与原生nginx转发的对比图</p></div>
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_line.png"><p>压测环境下灰度系统与原生nginx转发的对比图</p></div>
 
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/%E5%B8%A6cache%E6%9F%B1%E5%AD%90.png"><p>压测环境下灰度系统与原生nginx转发的数据对比</p></div>
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_data.png"><p>压测环境下灰度系统与原生nginx转发的数据对比</p></div>
 
 如图所示，用户请求完全命中cache是理想中的情况，灰度系统在理想情况下可以达到十分接近原生nginx转发的性能。
 
