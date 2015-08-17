@@ -92,12 +92,13 @@ Features:
                           ]
             }
 
-        当灰度系统启用uidappoint分流方式时，会根据用户请求的uid进行分流转发，若某请求uid恰好为234321，则将转发至beta2 upstream。
+        当灰度系统启用uidappoint分流方式时，会根据用户请求的uid进行分流转发。
+        当用户请求uid恰好为234321时，系统将其转发至beta2 upstream。
 
 5. 分流过程流程图
 <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/div_flowchart.png"></div>
 
-系统管理员通过系统管理接口将`某个分流策略`设置为`运行时策略`，并指定该策略对应的`分流模块`和`用户信息提取模块`后，此时系统开始进行分流工作。
+系统管理员通过系统管理接口将`某个分流策略`设置为`运行时策略`，并指定该策略对应的`分流模块`和`用户信息提取模块`后，系统开始进行分流工作。
 
 分流过程中，首先获得系统的`运行时信息`，然后提取`用户特征`，最后`分流模块`根据`用户特征`和`分流策略`计算得出应该转发到的upstream server。
    
