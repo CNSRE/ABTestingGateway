@@ -183,7 +183,9 @@ repo中的`utils/conf`文件夹中有灰度系统部署所需的最小示例
 
 如图所示，用户请求完全命中cache是理想中的情况，灰度系统在理想情况下可以达到十分接近原生nginx转发的性能。
 
-产生图中压测结果的场景是：用户请求经过proxy server转向upstream server，访问1KB大小的静态文件。proxy server的硬件配置：
+产生图中压测结果的场景是：用户请求经过proxy server转向upstream server，访问1KB大小的静态文件。
+
+proxy server的硬件配置：
 
 - CPU：E5620 2.4GHz 16核
 - Mem：24GB
