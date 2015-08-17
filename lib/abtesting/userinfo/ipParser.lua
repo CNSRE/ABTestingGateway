@@ -27,7 +27,7 @@ local ip2long = function(ip)
     return nil
 end
 
-local long2ip = function(ip)
+local long2ip = function(long)
     if type(long) ~= "number" then
         return nil
     end
