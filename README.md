@@ -33,7 +33,7 @@ Features:
 功能介绍
 ------------
 ###分流功能：
-转发和分流功能是灰度系统的主要功能，目前系统支持按照ip段分流、uid段分流、uid尾数分流和指定特殊uid分流四种方式。
+转发分流是灰度系统的主要功能，目前系统支持按照ip段分流、uid段分流、uid尾数分流和指定特殊uid分流四种方式。
     
 1. iprange
 
@@ -93,6 +93,14 @@ Features:
             }
 
         当灰度系统启用uidappoint分流方式时，会根据用户请求的uid进行分流转发，若某请求uid恰好为234321，则将转发至beta2 upstream。
+
+5. 分流过程流程图
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/div_flowchart.png"></div>
+
+系统管理员通过系统管理接口将`某个分流策略`设置为`运行时策略`，并指定该策略对应的`分流模块`和`用户信息提取模块`后，此时系统开始进行分流工作。
+
+分流过程中，首先获得系统的`运行时信息`，然后提取`用户特征`，最后`分流模块`根据`用户特征`和`分流策略`计算得出应该转发到的upstream server。
+   
 
 ###管理功能：
     
@@ -207,3 +215,4 @@ repo中的`utils/conf`文件夹中有灰度系统部署所需的一个最小示�
 - ngx_lua-0.9.13
 - lua-cjson-2.1.0.2
 - redis-2.8.19
+
