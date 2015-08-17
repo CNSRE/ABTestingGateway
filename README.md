@@ -217,7 +217,8 @@ repo中的`utils/conf`文件夹中有灰度系统部署所需的一个最小示�
 
 线上部署：
 -----------
-<div align="center"><img src="https://github.com/SinaMSRE/ABTestingGateway/blob/master/doc/img/deployment.png"></div>
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/deployment.png"></div>
+
 
 软件版本：
 -----------
