@@ -11,7 +11,7 @@ nginx是目前使用较多的7层服务器，可以实现高性能的转发和�
 
 针对这些缺点，我们基于[tengine](http://tengine.taobao.org/)和[ngx-lua](https://github.com/openresty/lua-nginx-module)设计实现了一个灰度发布系统，采用ngx-lua实现系统功能，采用redis作为分流策略数据库，通过启用[lua-shared-dict](http://wiki.nginx.org/HttpLuaModule#ngx.shared.DICT)和[lua-resty-lock](https://github.com/openresty/lua-resty-redis)作为系统缓存和缓存锁，系统获得了较为接近原生nginx转发的性能。
 
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="50%" height="50%"></div>
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="70%" height="70%"></div>
 
 - 系统实现了分流策略的动态即时更新，进而实现了动态调度功能。
 
@@ -33,7 +33,7 @@ Features:
 功能介绍
 ------------
 ###分流功能：
-转发和分流功能是灰度系统的主要功能，目前系统支持按照ip段分流、uid段分流、uid尾数分流和指定特殊uid分流四种方式；同时系统提供接口，基于此，开发人员可以灵活添加新的分流方式 ，进行二次开发。
+转发和分流功能是灰度系统的主要功能，目前系统支持按照ip段分流、uid段分流、uid尾数分流和指定特殊uid分流四种方式。
     
 1. iprange
 
