@@ -8,6 +8,24 @@ nginx是目前使用较多的7层服务器，可以实现高性能的转发和�
 
 <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="70%" height="70%"><p>ABTesingGateway 的架构简图</p></div>
 
+ABTesingGateway 项目是新浪研发中心技术保障部移动端保障团队出品，在[@平凡的香草](http://weibo.com/chunshengster)的指导下完成。
+
+在此特别感谢：
+
+- 王春生 微博:[@平凡的香草](http://weibo.com/chunshengster)
+- 王发康 微博:[@王发康博客](http://weibo.com/fakangwang)
+- 冯磊   微博:[@冯磊424](http://weibo.com/myfenglei)
+- 何凤存 微博:[@哈喽易](http://weibo.com/p/1005055196369143) 
+- 黄振栋 微博:[@BG2BKK](http://weibo.com/bg2bkk) 
+
+等同学的支持。
+
+感谢大家对 ABTesingGateway 的帮助。
+
+如果在使用过程中有任何问题，欢迎大家来吐槽，一起完善、一起提高、一起使用！
+
+email: bg2bkk@gmail.com  open.hfc@gmail.com
+
 Features:
 ----------
 
