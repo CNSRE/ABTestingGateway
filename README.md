@@ -1,6 +1,6 @@
 基于动态策略的灰度发布系统
 ========================
-ABTesingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于[tengine](http://tengine.taobao.org/)，采用[ngx-lua](https://github.com/openresty/lua-nginx-module)开发，使用 redis 作为分流策略数据库，可以实现动态调度功能。
+ABTesingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于[nginx](http://nginx.org/)和[ngx-lua](https://github.com/openresty/lua-nginx-module)开发，使用 redis 作为分流策略数据库，可以实现动态调度功能。
 
 nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，查找出目标upstream，进而实现分流。
 
