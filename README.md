@@ -66,6 +66,9 @@ ABTesingGateway 依据系统中配置的 `运行时信息runtimeInfo` 进行分�
 当灰度系统启用iprange分流方式时，会根据用户请求的ip进行分流转发。
 假如用户请求中的ip信息转为整型后是4000，将被转发至beta2 upstream。
 
+目前灰度系统支持的其他分流方式的策略样例在**utils/conf/policy_sample**
+
+
 3. 分流过程流程图
 <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/div_flowchart.png"><p>分流过程流程图</p></div>
    
