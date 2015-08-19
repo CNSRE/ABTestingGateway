@@ -1,0 +1,48 @@
+
+iprange分流方式的策略样例：
+
+{
+"divtype":"iprange",
+"divdata":[
+{"range":{"start":1111, "end":2222}, "upstream":"beta1"},
+{"range":{"start":3333, "end":4444}, "upstream":"beta2"},
+{"range":{"start":5555, "end":6666}, "upstream":"beta1"},
+{"range":{"start":7777, "end":2130706439}, "upstream":"beta3"}]
+}
+
+
+uidrange分流方式的策略样例：
+
+{
+"divtype":"uidrange",
+"divdata":[
+{"range":{"start":1111, "end":2222}, "upstream":"beta1"},
+{"range":{"start":3333, "end":4444}, "upstream":"beta2"},
+{"range":{"start":5555, "end":6666}, "upstream":"beta1"},
+{"range":{"start":7777, "end":1661638660}, "upstream":"beta3"}]
+}
+
+uidsuffix分流方式的策略样例：
+
+{
+"divtype":"uidsuffix",
+"divdata":[
+{"suffix":"1", "upstream":"beta1"},
+{"suffix":"3", "upstream":"beta2"},
+{"suffix":"5", "upstream":"beta1"},
+{"suffix":"0", "upstream":"beta3"}]
+}
+
+
+uidappoint分流方式的策略样例：
+
+{
+"divtype":"uidappoint",
+"divdata":[
+{"uidset":["1143321","43214321","324124"], "upstream":"beta1"},
+{"uidset":["34321","324213", "234321"], "upstream":"beta2"},
+{"uidset":["245245","4325","5324","542"], "upstream":"beta1"},
+{"uidset":["546","563","656", "1661638660"], "upstream":"beta3"}]
+}
+
+
