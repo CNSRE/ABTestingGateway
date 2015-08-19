@@ -90,7 +90,7 @@ _M.getUpstream = function(self, uid)
         return nil
     end
     
-    local database, key = self.database, self.key
+    local database, key = self.database, self.policyLib
     
     local backend, err = database:hget(key, uid)
     if not backend then error{ERRORINFO.REDIS_ERROR, err} end
