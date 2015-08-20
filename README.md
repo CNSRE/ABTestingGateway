@@ -14,7 +14,8 @@ ABTesingGateway 项目是新浪研发中心技术保障部移动端保障团队�
 
 - 王春生 微博:[@平凡的香草](http://weibo.com/chunshengster)
 - 王发康 微博:[@王发康博客](http://weibo.com/fakangwang)
-- 冯磊   微博:[@冯磊424](http://weibo.com/myfenglei)
+- 冯磊    微博:[@冯磊424](http://weibo.com/myfenglei)
+- 金普    微博:[@jinpulym](http://weibo.com/jinpulym) 
 - 何凤存 微博:[@哈喽易](http://weibo.com/p/1005055196369143) 
 - 黄振栋 微博:[@BG2BKK](http://weibo.com/bg2bkk) 
 
