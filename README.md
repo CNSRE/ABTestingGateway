@@ -1,14 +1,14 @@
 基于动态策略的灰度发布系统
 ========================
-ABTesingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于[nginx](http://nginx.org/)和[ngx-lua](https://github.com/openresty/lua-nginx-module)开发，使用 redis 作为分流策略数据库，可以实现动态调度功能。
+ABTestingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于[nginx](http://nginx.org/)和[ngx-lua](https://github.com/openresty/lua-nginx-module)开发，使用 redis 作为分流策略数据库，可以实现动态调度功能。
 
 nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，查找出目标upstream，进而实现分流。
 
-在以往的基于 nginx 实现的灰度系统中，分流逻辑往往通过 rewrite 阶段的 if 和 rewrite 指令等实现，优点是`性能较高`，缺点是`功能受限`、`容易出错`，以及`转发规则固定，只能静态分流`。针对这些缺点，我们设计实现了ABTesingGateway，采用 ngx-lua 实现系统功能，通过启用[lua-shared-dict](http://wiki.nginx.org/HttpLuaModule#ngx.shared.DICT)和[lua-resty-lock](https://github.com/openresty/lua-resty-redis)作为系统缓存和缓存锁，系统获得了较为接近原生nginx转发的性能。
+在以往的基于 nginx 实现的灰度系统中，分流逻辑往往通过 rewrite 阶段的 if 和 rewrite 指令等实现，优点是`性能较高`，缺点是`功能受限`、`容易出错`，以及`转发规则固定，只能静态分流`。针对这些缺点，我们设计实现了ABTestingGateway，采用 ngx-lua 实现系统功能，通过启用[lua-shared-dict](http://wiki.nginx.org/HttpLuaModule#ngx.shared.DICT)和[lua-resty-lock](https://github.com/openresty/lua-resty-redis)作为系统缓存和缓存锁，系统获得了较为接近原生nginx转发的性能。
 
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="70%" height="70%"><p>ABTesingGateway 的架构简图</p></div>
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="70%" height="70%"><p>ABTestingGateway 的架构简图</p></div>
 
-ABTesingGateway 项目是新浪研发中心技术保障部移动端保障团队出品，在[@平凡的香草](http://weibo.com/chunshengster)的指导下完成。
+ABTestingGateway 项目是新浪研发中心技术保障部移动端保障团队出品，在[@平凡的香草](http://weibo.com/chunshengster)的指导下完成。
 
 在此特别感谢：
 
@@ -21,7 +21,7 @@ ABTesingGateway 项目是新浪研发中心技术保障部移动端保障团队�
 
 等同学的支持。
 
-感谢大家对 ABTesingGateway 的帮助。
+感谢大家对 ABTestingGateway 的帮助。
 
 如果在使用过程中有任何问题，欢迎大家来吐槽，一起完善、一起提高、一起使用！
 
@@ -40,9 +40,9 @@ Features:
 系统实现
 ------------
 ###分流功能：
-转发分流是灰度系统的主要功能，目前 ABTesingGateway 支持 `ip段分流(iprange)`、`uid用户段分流(uidrange)`、`uid尾数分流(uidsuffix)` 和 `指定特殊uid分流(uidappoint)` 四种方式。
+转发分流是灰度系统的主要功能，目前 ABTestingGateway 支持 `ip段分流(iprange)`、`uid用户段分流(uidrange)`、`uid尾数分流(uidsuffix)` 和 `指定特殊uid分流(uidappoint)` 四种方式。
 
-ABTesingGateway 依据系统中配置的 `运行时信息runtimeInfo` 进行分流工作；通过将 runtimeInfo 设置为不同的分流策略，实现运行时分流策略的动态更新，达到动态调度的目的。
+ABTestingGateway 依据系统中配置的 `运行时信息runtimeInfo` 进行分流工作；通过将 runtimeInfo 设置为不同的分流策略，实现运行时分流策略的动态更新，达到动态调度的目的。
 
 1. 系统运行时信息设置
 
