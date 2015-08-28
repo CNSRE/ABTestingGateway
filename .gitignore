@@ -8,3 +8,8 @@
 *.out
 *.rdb
 t/servroot/
+*temp/
+*.sh
+
+*stdout
+
