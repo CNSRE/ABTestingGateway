@@ -18,6 +18,7 @@ _M.divtypes = {
     ["uidrange"]    = 'uidParser',
     ["uidsuffix"]   = 'uidParser',
     ["uidappoint"]  = 'uidParser',
+    ["arg_city"]    = 'cityParser'
 }
 
 _M.prefixConf = {
