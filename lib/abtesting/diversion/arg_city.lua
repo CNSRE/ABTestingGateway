@@ -69,7 +69,6 @@ _M.getUpstream = function(self, city)
     
     local database	= self.database
     local policyLib = self.policyLib
-    ngx.log(ngx.ERR, "test")
     
     local upstream, err = database:hget(policyLib , city)
     if not upstream then error{ERRORINFO.REDIS_ERROR, err} end
