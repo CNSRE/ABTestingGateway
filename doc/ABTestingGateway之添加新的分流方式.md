@@ -169,5 +169,16 @@ _M.divtypes = {
 }
 ```
 每种divtype会有对应的提取模块，因此divtype为arg_city的分流方式对应的用户信息提取模块就是**lib/abtesting/userinfo/cityParser.lua**。
+```lua
+local _M = {
+    _VERSION = '0.01'
+}
 
+_M.get = function()
+	local u = ngx.var.arg_city
+    ngx.log(ngx.ERR, u)
+	return u
+end
+return _M
+```
 以上就是向系统添加新的分流方式的具体步骤。最新的代码已提交至repo中。
