@@ -95,7 +95,7 @@ _M.getUpstream = function(self, uid)
     local backend, err = database:hget(key, uid)
     if not backend then error{ERRORINFO.REDIS_ERROR, err} end
     
-    if backend == ngx.nul then backend = nil end
+    if backend == ngx.null then backend = nil end
     
     return backend
 end
