@@ -1,0 +1,189 @@
+[47154] 02 Dec 10:33:11.395 # Opening socket: bind: Address already in use
+[36540] 02 Dec 10:44:47.687 # Opening socket: bind: Address already in use
+[26601] 02 Dec 10:45:32.545 # Opening socket: bind: Address already in use
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 2.8.19 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in stand alone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 42959
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+[42959] 02 Dec 10:45:41.106 # Server started, Redis version 2.8.19
+[42959] 02 Dec 10:45:41.106 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+[42959] 02 Dec 10:45:41.106 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+[42959] 02 Dec 10:45:41.106 # WARNING: The TCP backlog setting of 20000 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 8192.
+[42959] 02 Dec 10:45:41.106 * The server is now ready to accept connections on port 6379
+[42959 | signal handler] (1449024342) Received SIGINT scheduling shutdown...
+[42959] 02 Dec 10:45:42.409 # User requested shutdown...
+[42959] 02 Dec 10:45:42.409 * Saving the final RDB snapshot before exiting.
+[42959] 02 Dec 10:45:42.441 * DB saved on disk
+[42959] 02 Dec 10:45:42.442 # Redis is now ready to exit, bye bye...
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 2.8.19 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in stand alone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 30490
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+[30490] 02 Dec 10:46:24.473 # Server started, Redis version 2.8.19
+[30490] 02 Dec 10:46:24.473 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+[30490] 02 Dec 10:46:24.473 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+[30490] 02 Dec 10:46:24.473 # WARNING: The TCP backlog setting of 20000 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 8192.
+[30490] 02 Dec 10:46:24.473 * DB loaded from disk: 0.000 seconds
+[30490] 02 Dec 10:46:24.473 * The server is now ready to accept connections on port 6379
+[30490] 02 Dec 10:46:24.473 * The server is now ready to accept connections at /tmp/redis.sock
+[30490 | signal handler] (1449024385) Received SIGINT scheduling shutdown...
+[30490] 02 Dec 10:46:25.275 # User requested shutdown...
+[30490] 02 Dec 10:46:25.275 * Saving the final RDB snapshot before exiting.
+[30490] 02 Dec 10:46:25.311 * DB saved on disk
+[30490] 02 Dec 10:46:25.311 * Removing the unix socket file.
+[30490] 02 Dec 10:46:25.311 # Redis is now ready to exit, bye bye...
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 2.8.19 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in stand alone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 46230
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+[46230] 02 Dec 10:46:32.488 # Server started, Redis version 2.8.19
+[46230] 02 Dec 10:46:32.488 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+[46230] 02 Dec 10:46:32.488 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+[46230] 02 Dec 10:46:32.488 # WARNING: The TCP backlog setting of 20000 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 8192.
+[46230] 02 Dec 10:46:32.488 * DB loaded from disk: 0.000 seconds
+[46230] 02 Dec 10:46:32.488 * The server is now ready to accept connections on port 6379
+[46230] 02 Dec 10:46:32.488 * The server is now ready to accept connections at /tmp/redis.sock
+[46230 | signal handler] (1449024393) Received SIGINT scheduling shutdown...
+[46230] 02 Dec 10:46:33.590 # User requested shutdown...
+[46230] 02 Dec 10:46:33.590 * Saving the final RDB snapshot before exiting.
+[46230] 02 Dec 10:46:33.609 * DB saved on disk
+[46230] 02 Dec 10:46:33.609 * Removing the unix socket file.
+[46230] 02 Dec 10:46:33.609 # Redis is now ready to exit, bye bye...
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 2.8.19 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in stand alone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 1045
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+[1045] 02 Dec 10:46:34.290 # Server started, Redis version 2.8.19
+[1045] 02 Dec 10:46:34.290 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+[1045] 02 Dec 10:46:34.290 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+[1045] 02 Dec 10:46:34.290 # WARNING: The TCP backlog setting of 20000 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 8192.
+[1045] 02 Dec 10:46:34.290 * DB loaded from disk: 0.000 seconds
+[1045] 02 Dec 10:46:34.290 * The server is now ready to accept connections on port 6379
+[1045] 02 Dec 10:46:34.290 * The server is now ready to accept connections at /tmp/redis.sock
+[1045] 02 Dec 10:51:35.048 * 10 changes in 300 seconds. Saving...
+[1045] 02 Dec 10:51:35.049 * Background saving started by pid 1440
+[1440] 02 Dec 10:51:35.082 * DB saved on disk
+[1440] 02 Dec 10:51:35.082 * RDB: 6 MB of memory used by copy-on-write
+[1045] 02 Dec 10:51:35.149 * Background saving terminated with success
+[1045] 02 Dec 15:13:18.171 * 1 changes in 900 seconds. Saving...
+[1045] 02 Dec 15:13:18.172 * Background saving started by pid 40555
+[40555] 02 Dec 15:13:18.211 * DB saved on disk
+[40555] 02 Dec 15:13:18.211 * RDB: 6 MB of memory used by copy-on-write
+[1045] 02 Dec 15:13:18.272 * Background saving terminated with success
+[1045] 02 Dec 15:28:19.098 * 1 changes in 900 seconds. Saving...
+[1045] 02 Dec 15:28:19.099 * Background saving started by pid 44524
+[44524] 02 Dec 15:28:19.133 * DB saved on disk
+[44524] 02 Dec 15:28:19.133 * RDB: 6 MB of memory used by copy-on-write
+[1045] 02 Dec 15:28:19.199 * Background saving terminated with success
+[1045] 02 Dec 15:43:20.094 * 1 changes in 900 seconds. Saving...
+[1045] 02 Dec 15:43:20.095 * Background saving started by pid 48377
+[48377] 02 Dec 15:43:20.136 * DB saved on disk
+[48377] 02 Dec 15:43:20.136 * RDB: 6 MB of memory used by copy-on-write
+[1045] 02 Dec 15:43:20.195 * Background saving terminated with success
+[1045] 02 Dec 16:22:45.949 * 1 changes in 900 seconds. Saving...
+[1045] 02 Dec 16:22:45.949 * Background saving started by pid 35888
+[35888] 02 Dec 16:22:45.986 * DB saved on disk
+[35888] 02 Dec 16:22:45.986 * RDB: 6 MB of memory used by copy-on-write
+[1045] 02 Dec 16:22:46.049 * Background saving terminated with success
+[1045] 02 Dec 16:41:24.857 * 1 changes in 900 seconds. Saving...
+[1045] 02 Dec 16:41:24.858 * Background saving started by pid 28031
+[28031] 02 Dec 16:41:24.901 * DB saved on disk
+[28031] 02 Dec 16:41:24.902 * RDB: 6 MB of memory used by copy-on-write
+[1045] 02 Dec 16:41:24.958 * Background saving terminated with success
+[1045] 02 Dec 16:56:25.039 * 1 changes in 900 seconds. Saving...
+[1045] 02 Dec 16:56:25.039 * Background saving started by pid 30955
+[30955] 02 Dec 16:56:25.075 * DB saved on disk
+[30955] 02 Dec 16:56:25.075 * RDB: 6 MB of memory used by copy-on-write
+[1045] 02 Dec 16:56:25.140 * Background saving terminated with success
+[1045] 03 Dec 18:28:39.189 * 1 changes in 900 seconds. Saving...
+[1045] 03 Dec 18:28:39.190 * Background saving started by pid 36910
+[36910] 03 Dec 18:28:39.229 * DB saved on disk
+[36910] 03 Dec 18:28:39.230 * RDB: 6 MB of memory used by copy-on-write
+[1045] 03 Dec 18:28:39.291 * Background saving terminated with success
+[1045] 03 Dec 18:43:40.033 * 1 changes in 900 seconds. Saving...
+[1045] 03 Dec 18:43:40.034 * Background saving started by pid 20770
+[20770] 03 Dec 18:43:40.072 * DB saved on disk
+[20770] 03 Dec 18:43:40.072 * RDB: 6 MB of memory used by copy-on-write
+[1045] 03 Dec 18:43:40.134 * Background saving terminated with success
+[1045] 04 Dec 17:26:27.160 * 1 changes in 900 seconds. Saving...
+[1045] 04 Dec 17:26:27.161 * Background saving started by pid 11911
+[11911] 04 Dec 17:26:27.195 * DB saved on disk
+[11911] 04 Dec 17:26:27.196 * RDB: 6 MB of memory used by copy-on-write
+[1045] 04 Dec 17:26:27.261 * Background saving terminated with success
+[1045] 09 Dec 14:07:11.582 * 1 changes in 900 seconds. Saving...
+[1045] 09 Dec 14:07:11.584 * Background saving started by pid 19939
+[19939] 09 Dec 14:07:11.617 * DB saved on disk
+[19939] 09 Dec 14:07:11.618 * RDB: 6 MB of memory used by copy-on-write
+[1045] 09 Dec 14:07:11.684 * Background saving terminated with success
+[1045] 10 Dec 17:07:56.150 * 1 changes in 900 seconds. Saving...
+[1045] 10 Dec 17:07:56.151 * Background saving started by pid 26745
+[26745] 10 Dec 17:07:56.191 * DB saved on disk
+[26745] 10 Dec 17:07:56.191 * RDB: 6 MB of memory used by copy-on-write
+[1045] 10 Dec 17:07:56.251 * Background saving terminated with success
+[1045] 10 Dec 17:22:57.044 * 1 changes in 900 seconds. Saving...
+[1045] 10 Dec 17:22:57.045 * Background saving started by pid 41666
+[41666] 10 Dec 17:22:57.073 * DB saved on disk
+[41666] 10 Dec 17:22:57.074 * RDB: 6 MB of memory used by copy-on-write
+[1045] 10 Dec 17:22:57.145 * Background saving terminated with success
+[1045] 11 Dec 16:50:15.219 * DB saved on disk
+[1045] 11 Dec 16:55:16.013 * 10 changes in 300 seconds. Saving...
+[1045] 11 Dec 16:55:16.014 * Background saving started by pid 38246
+[38246] 11 Dec 16:55:16.046 * DB saved on disk
+[38246] 11 Dec 16:55:16.046 * RDB: 6 MB of memory used by copy-on-write
+[1045] 11 Dec 16:55:16.115 * Background saving terminated with success
