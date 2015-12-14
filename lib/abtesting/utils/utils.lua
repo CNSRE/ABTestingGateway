@@ -3,7 +3,8 @@ local _M = {}
 _M._VERSION = '0.0.1'
 
 local cjson = require('cjson.safe')
---将doresp和dolog，与handler统一起来。handler将返回一个table，结构为：
+--将doresp和dolog，与handler统一起来。
+--handler将返回一个table，结构为：
 --[[
 handler———errinfo————errcode————code
     |           |               |
