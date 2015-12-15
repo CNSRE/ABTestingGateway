@@ -18,9 +18,10 @@ _M.divtypes = {
     ["uidrange"]    = 'uidParser',
     ["uidsuffix"]   = 'uidParser',
     ["uidappoint"]  = 'uidParser',
+    ["arg_city"]    = 'cityParser',
 
-    ["url"]     = 'urlParser',
-}
+    ["url"]         = 'urlParser'
+}   
 
 _M.prefixConf = {
     ["policyLibPrefix"]     = ngx.var.policy_prefix,

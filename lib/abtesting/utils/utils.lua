@@ -22,7 +22,7 @@ _M.dolog = function(info, desc, data, errstack)
     local errcode = code
     local errinfo = desc and err..desc or err 
     
-    errlog = errlog .. ' errcode : '..errcode
+    errlog = errlog .. ' code : '..errcode
     errlog = errlog .. ', errinfo : '..errinfo
     if data then
         errlog = errlog .. ', extrainfo : '..data

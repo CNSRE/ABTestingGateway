@@ -37,9 +37,14 @@ _M.info = {
     ['RUNTIME_BLANK_ERROR']     = { 50402, 'expect runtime info for '},
     ['MODULE_BLANK_ERROR']	= { 50403, 'no required module for '},
     ['USERINFO_BLANK_ERROR']	= { 50404, 'no userinfo fetched from '},
+
+    ['ARGS_BLANK_ERROR']	= { 50405, 'no uri_args fetched from '},
+    ['ACTION_BLANK_ERROR']	= { 50406, 'no action fetched from '},
+
+    ['DOACTION_ERROR']	        = { 50501, 'error during action of '},
     
     --  unknown reason
-    ['UNKNOWN_ERROR']		= { 50501, 'unknown reason '},
+    ['UNKNOWN_ERROR']		= { 50601, 'unknown reason '},
 }
 
 return _M
