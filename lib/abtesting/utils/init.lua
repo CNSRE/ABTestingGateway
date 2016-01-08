@@ -24,7 +24,7 @@ _M.divtypes = {
 _M.prefixConf = {
     ["policyLibPrefix"]     = ngx.var.policy_prefix,
     ["runtimeInfoPrefix"]   = ngx.var.runtime_prefix,
-    ["domainname"]          = ngx.var.server_name,
+    ["domainname"]          = ngx.var.domain_name,
 }
 
 _M.divConf = {
