@@ -27,6 +27,10 @@ ABTestingGateway 项目是新浪研发中心技术保障部移动端保障团队
 
 email: bg2bkk@gmail.com  open.hfc@gmail.com
 
+压测数据：[压测报告](https://github.com/WEIBOMSRE/ABTestingGateway/blob/master/doc/%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83%E7%B3%BB%E7%BB%9F%E5%8E%8B%E6%B5%8B%E6%8A%A5%E5%91%8A.pdf)
+
+项目演讲：[演讲文档](https://github.com/WEIBOMSRE/ABTestingGateway/blob/master/doc/%E5%9F%BA%E4%BA%8E%E5%8A%A8%E6%80%81%E7%AD%96%E7%95%A5%E7%9A%84%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83%E7%B3%BB%E7%BB%9F.pdf)
+
 Features:
 ----------
 
