@@ -10,6 +10,8 @@
 t/servroot/
 *temp/
 *.sh
+*.pyc
 
 *stdout
 
+*.log

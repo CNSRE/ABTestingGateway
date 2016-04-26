@@ -8,15 +8,9 @@ local metatable = {__index = _M}
 
 _M._VERSION = "0.0.1"
 
-local ERRORINFO	     = require('abtesting.error.errcode').info
+local ERRORINFO = require('abtesting.error.errcode').info
+local fields    = require('abtesting.utils.init').fields
 
----
--- @field fields
--- @warning this is a conf, may other file later
-local fields= {}
-fields.divModulename = 'divModulename'
-fields.divDataKey = 'divDataKey'
-fields.userInfoModulename = 'userInfoModulename'
 local separator = ':'
 
 ---
