@@ -14,6 +14,7 @@ local redisModule   = require('abtesting.utils.redis')
 local systemConf    = require('abtesting.utils.init')
 local handler       = require('abtesting.error.handler').handler
 local utils         = require('abtesting.utils.utils')
+local log			= require('abtesting.utils.log')
 local ERRORINFO     = require('abtesting.error.errcode').info
 local cjson         = require('cjson.safe')
 
@@ -24,159 +25,88 @@ local policyLib     = prefixConf.policyLibPrefix
 local domain_name   = prefixConf.domainname
 local divtypes      = systemConf.divtypes
 
-local fields = {}
-fields.divModulename        = 'divModulename'
-fields.divDataKey           = 'divDataKey'
-fields.userInfoModulename   = 'userInfoModulename'
+local fields        = systemConf.fields
 
-local separator = ':'
-fields.divtype  = 'divtype'
-fields.divdata  = 'divdata'
-fields.idCount  = 'idCount'
+local runtimeGroupModule = require('abtesting.adapter.runtimegroup')
+local policyGroupModule  = require('abtesting.adapter.policygroup')
+local policyGroupLib     = prefixConf.policyGroupPrefix
 
-local doresp    = utils.doresp
-local dolog     = utils.dolog
 
-local getDomainName = function()
-    local domainName = domain_name 
-    if not domainName or domainName == ngx.null 
-        or string.len(domainName) < 1 then
-        local info = ERRORINFO.PARAMETER_NONE 
-        local desc = "domainName is blank and please set it in nginx.conf"
-        local response = doresp(info, desc)
-        dolog(info, desc)
-        ngx.say(response)
-        return false
-    end
-
-    return domainName
-end
+local doresp        = utils.doresp
+local dolog         = utils.dolog
+local doerror       = utils.doerror
 
 local getPolicyId = function()
-    local policyID      = ngx.var.arg_policyid
-
-    if policyID then
-        policyID = tonumber(ngx.var.arg_policyid)
-        if not policyID or policyID < 0 then
-            local info = ERRORINFO.PARAMETER_TYPE_ERROR 
-            local desc = "policyID should be a positive Integer"
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil 
-        end
-    end
-
-    if not policyID then
-        local request_body  = ngx.var.request_body
-        local postData      = cjson.decode(request_body)
-
-        if not request_body then
-            -- ERRORCODE.PARAMETER_NONE
-            local info = ERRORINFO.PARAMETER_NONE 
-            local desc = 'request_body or post data to get policyID'
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil 
-        end
-
-        if not postData then
-            -- ERRORCODE.PARAMETER_ERROR
-            local info = ERRORINFO.PARAMETER_ERROR 
-            local desc = 'postData is not a json string'
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil 
-        end
-
-        policyID = postData.policyid
-
-        if not policyID then
-            local info = ERRORINFO.PARAMETER_ERROR 
-            local desc = "policyID is needed"
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil
-        end
-
-        policyID = tonumber(postData.policyid)
-
-        if not policyID or policyID < 0 then
-            local info = ERRORINFO.PARAMETER_TYPE_ERROR 
-            local desc = "policyID should be a positive Integer"
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil
-        end
-    end
-
+    local policyID = tonumber(ngx.var.arg_policyid)
     return policyID
+end
 
+local getPolicyGroupId = function()
+    local policyGroupId = tonumber(ngx.var.arg_policygroupid)
+    return policyGroupId
+end
+
+local getHostName = function()
+    local hostname = ngx.var.arg_hostname
+    return hostname
+end
+
+local getDivSteps = function()
+    local divsteps = tonumber(ngx.var.arg_divsteps)
+    return divsteps
 end
 
 _M.get = function(option)
     local db = option.db
+    local database = db.redis
 
-    local domainName = getDomainName()
-    if not domainName then
-        return false
+    local hostname = getHostName()
+    if not hostname or string.len(hostname) < 1 or hostname == ngx.null then
+        local info = ERRORINFO.PARAMETER_TYPE_ERROR 
+        local desc = 'arg hostname invalid: '
+        local response = doresp(info, desc)
+        log:errlog(dolog(info, desc))
+        ngx.say(response)
+        return nil 
     end
 
     local pfunc = function()
-        local runtimeMod = runtimeModule:new(db.redis, runtimeLib) 
-        return runtimeMod:get(domainName)
+        local runtimeGroupMod = runtimeGroupModule:new(database, runtimeLib)
+        return runtimeGroupMod:get(hostname)
     end
-
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
-    else
-        divModulename       = fields.divModulename 
-        divDataKey          = fields.divDataKey 
-        userInfoModulename  = fields.userInfoModulename 
-
-        local runtimeInfo   = {}
-        runtimeInfo[divModulename]      = info[1]
-        runtimeInfo[divDataKey]         = info[2]
-        runtimeInfo[userInfoModulename] = info[3]
-
-        local response = doresp(ERRORINFO.SUCCESS, nil, runtimeInfo)
-        ngx.say(response)
-        return true
     end
 
+    local response = doresp(ERRORINFO.SUCCESS, nil, info)
+    ngx.say(response)
+    return true
 end
 
 _M.del = function(option)
     local db = option.db
+    local database = db.redis
 
-    local domainName = getDomainName()
-    if not domainName then
-        return false
+    local hostname = getHostName()
+    if not hostname or string.len(hostname) < 1 or hostname == ngx.null then
+        local info = ERRORINFO.PARAMETER_TYPE_ERROR 
+        local desc = 'arg hostname invalid: '
+        local response = doresp(info, desc)
+        log:errlog(dolog(info, desc))
+        ngx.say(response)
+        return nil 
     end
 
     local pfunc = function()
-        local runtimeMod = runtimeModule:new(db.redis, runtimeLib) 
-        runtimeMod:del(domainName)
+        local runtimeGroupMod = runtimeGroupModule:new(database, runtimeLib)
+        return runtimeGroupMod:del(hostname)
     end
-
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
@@ -187,66 +117,114 @@ _M.del = function(option)
 end
 
 _M.set = function(option)
-    local db = option.db
-
     local policyId = getPolicyId()
-    if not policyId then
-        return false
-    end
+    local policyGroupId = getPolicyGroupId()
 
-    local domainName = getDomainName()
-    if not domainName then
-        return false
+    if policyId and policyId >= 0 then
+        _M.runtimeset(option, policyId)
+    elseif policyGroupId and policyGroupId >= 0 then
+        _M.groupset(option, policyGroupId)
+    else
+        local info = ERRORINFO.PARAMETER_TYPE_ERROR 
+        local desc = "policyId or policyGroupid invalid"
+        local response = doresp(info, desc)
+        log:errlog(dolog(info, desc))
+        ngx.say(response)
+        return nil 
+    end
+end
+
+_M.groupset = function(option, policyGroupId)
+    local db = option.db
+    local database = db.redis
+
+    local hostname = getHostName()
+    local divsteps = getDivSteps()
+
+    if not hostname or string.len(hostname) < 1 or hostname == ngx.null then
+        local info = ERRORINFO.PARAMETER_TYPE_ERROR 
+        local desc = 'arg hostname invalid: '
+        local response = doresp(info, desc)
+        log:errlog(dolog(info, desc))
+        ngx.say(response)
+        return nil 
     end
 
     local pfunc = function()
-        local policyMod = policyModule:new(db.redis, policyLib)
-        return policyMod:get(policyId)
+        local runtimeGroupMod = runtimeGroupModule:new(database, runtimeLib)
+        runtimeGroupMod:del(hostname)
+        return runtimeGroupMod:set(hostname, policyGroupId, divsteps)
     end
-
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
 
-    local divtype = info.divtype
-    local divdata = info.divdata
-    if divtype == ngx.null or
-        divdata == ngx.null then
-        local err	= ERRORINFO.POLICY_BLANK_ERROR
-        local desc	= 'policy NO.'..policyId
-        local response  = doresp(err, desc)
-        dolog(err, desc)
+    local response = doresp(ERRORINFO.SUCCESS)
+    ngx.say(response)
+    return true
+
+end
+
+_M.runtimeset = function(option, policyId)
+    local db = option.db
+    local database = db.redis
+
+    local hostname = getHostName()
+    local divsteps = 1
+
+    if not hostname or string.len(hostname) < 1 or hostname == ngx.null then
+        local info = ERRORINFO.PARAMETER_TYPE_ERROR 
+        local desc = 'arg hostname invalid: '
+        local response = doresp(info, desc)
+        log:errlog(dolog(info, desc))
+        ngx.say(response)
+        return nil 
+    end
+
+    local pfunc = function()
+        local runtimeGroupMod = runtimeGroupModule:new(database, runtimeLib)
+        return runtimeGroupMod:del(hostname)
+    end
+    local status, info = xpcall(pfunc, handler)
+    if not status then
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
 
-    if not divtypes[divtype] then
-        -- unsupported divtype
-    end
-
     local pfunc = function()
-        local divModulename     = table.concat({'abtesting', 'diversion', divtype}, '.')
-        local divDataKey        = table.concat({policyLib, policyId, fields.divdata}, ':')
-        local userInfoModulename= table.concat({'abtesting', 'userinfo', divtypes[divtype]}, '.')
+        local policyMod = policyModule:new(database, policyLib)
+        local policy = policyMod:get(policyId)
 
-        local runtimeMod        = runtimeModule:new(db.redis, runtimeLib) 
-        return runtimeMod:set(domainName, divModulename, divDataKey, userInfoModulename)
+        local divtype = policy.divtype
+        local divdata = policy.divdata
+
+        if divtype == ngx.null or divdata == ngx.null then
+            error{ERRORINFO.POLICY_BLANK_ERROR, 'policy NO '..policyId}
+        end
+
+        if not divtypes[divtype] then
+
+        end
+
+        local prefix             = hostname .. ':first'
+        local divModulename      = table.concat({'abtesting', 'diversion', divtype}, '.')
+        local divDataKey         = table.concat({policyLib, policyId, fields.divdata}, ':')
+        local userInfoModulename = table.concat({'abtesting', 'userinfo', divtypes[divtype]}, '.')
+        local runtimeMod         = runtimeModule:new(database, runtimeLib) 
+        runtimeMod:set(prefix, divModulename, divDataKey, userInfoModulename)
+
+        local divSteps           = runtimeLib .. ':' .. hostname .. ':' .. fields.divsteps
+        local ok, err = database:set(divSteps, 1)
+        if not ok then error{ERRORINFO.REDIS_ERROR, err} end
     end
 
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
@@ -257,5 +235,3 @@ _M.set = function(option)
 end
 
 return _M
-
-

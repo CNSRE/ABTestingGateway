@@ -24,20 +24,45 @@ _M.divtypes = {
 }   
 
 _M.prefixConf = {
-    ["policyLibPrefix"]     = ngx.var.policy_prefix,
-    ["runtimeInfoPrefix"]   = ngx.var.runtime_prefix,
-    ["domainname"]          = ngx.var.server_name,
+    ["policyLibPrefix"]     = 'ab:policies',
+    ["policyGroupPrefix"]   = 'ab:policygroups',
+    ["runtimeInfoPrefix"]   = 'ab:runtimeInfo',
+    ["domainname"]          = ngx.var.domain_name,
 }
 
 _M.divConf = {
-    ["default_backend"]     = ngx.var.default_backend;
-    ["shdict_expire"]       = ngx.var.shdict_expire;
+    ["default_backend"]     = ngx.var.default_backend,
+    ["shdict_expire"]       = 60,   -- in s
+--    ["shdict_expire"]       = ngx.var.shdict_expire,
 }
 
 _M.cacheConf = {
     ['timeout']             = ngx.var.lock_expire,
     ['runtimeInfoLock']     = ngx.var.rt_cache_lock,
     ['upstreamLock']        = ngx.var.up_cache_lock,
+}
+
+_M.indices = {
+    'first', 'second', 'third',
+    'forth', 'fifth', 'sixth', 
+    'seventh', 'eighth', 'ninth'
+}
+
+_M.fields = {
+    ['divModulename']       = 'divModulename',           
+    ['divDataKey']          = 'divDataKey',
+    ['userInfoModulename']  = 'userInfoModulename',
+    ['divtype']             = 'divtype',
+    ['divdata']             = 'divdata',
+    ['idCount']             = 'idCount',
+    ['divsteps']            = 'divsteps'
+}
+
+_M.loglv = {
+
+    ['err']					= ngx.ERR, 
+	['info']				= ngx.INFO,           ['warn']				  = ngx.WARN,      
+    ['debug']				= ngx.DEBUG,           
 }
 
 return _M

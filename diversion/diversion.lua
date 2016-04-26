@@ -1,72 +1,41 @@
-local runtimeModule = require('abtesting.adapter.runtime')
+local runtimeModule = require('abtesting.adapter.runtimegroup')
 local redisModule   = require('abtesting.utils.redis')
 local systemConf    = require('abtesting.utils.init')
+local utils         = require('abtesting.utils.utils')
+local logmod	   	= require("abtesting.utils.log")
+local cache         = require('abtesting.utils.cache')
 local handler	    = require('abtesting.error.handler').handler
 local ERRORINFO	    = require('abtesting.error.errcode').info
 local cjson         = require('cjson.safe')
-local utils         = require('abtesting.utils.utils')
 local resty_lock    = require("resty.lock")
+local semaphore     = require("abtesting.utils.sema")
+
+local dolog         = utils.dolog	
+local doerror       = utils.doerror
 
 local redisConf	    = systemConf.redisConf
 local prefixConf    = systemConf.prefixConf
 local divConf       = systemConf.divConf
-local cacheConf     = systemConf.cacheConf
+local indices       = systemConf.indices
+local fields        = systemConf.fields
+local runtimeLib    = prefixConf.runtimeInfoPrefix
+local redirectInfo  = 'proxypass to upstream http://'
 
-local runtimeInfoLib    = prefixConf.runtimeInfoPrefix
-local domainname        = prefixConf.domainname
+local sema          = semaphore.sema
+local upsSema       = semaphore.upsSema
 
-local shdict_expire     = divConf.shdict_expire or 60
-local default_backend   = divConf.default_backend
-
-local cache_expire      = cacheConf.timeout or 0.001
-local rt_cache_lock     = cacheConf.runtimeInfoLock
-
-local dolog = utils.dolog	
-
-local sysConfig	  = ngx.shared.sysConfig
-local kv_upstream = ngx.shared.kv_upstream
+local upstream      = nil
 
 local getRewriteInfo = function()
-    return 'redirect to upstream http://'..ngx.var.backend
+    return redirectInfo..ngx.var.backend
 end
 
-local doredirect = function() 
+local doredirect = function(info) 
     local ok  = ERRORINFO.SUCCESS
-    local err = 'redirect to upstream http://'..ngx.var.backend
-    dolog(ok, err)
+    local err = redirectInfo..ngx.var.backend
+    return dolog(ok, err, info)
 end
 
-local isNULL = function(v)
-    return not v or v == ngx.null
-end
-
-local areNULL = function(...)
-    local t = {...}
-    if not next(t) then
-        return true
-    end
-    for k, v in pairs(t) do
-        if isNULL(v) then
-            return true
-        end
-    end
-    return false 
-end
-
-local isSwitchOff = function(...)
-    local t = {...}
-    if not next(t) then
-        return true
-    end
-    for k, v in pairs(t) do
-        if v == -1 then
-            return true
-        end
-    end
-    return false
-end
-
-local red
 local setKeepalive = function(red) 
     local ok, err = red:keepalivedb()  
     if not ok then
@@ -77,179 +46,296 @@ local setKeepalive = function(red)
     end
 end
 
---====================================================
---获取当前domain的运行时
---		分流模块名			divModulename
---		分流策略库名		divDataKey
---		用户特征提取模块名	userInfoModulename
+local getHost = function()
+    local host = ngx.req.get_headers()['Host']
+    if not host then return nil end
+    local hostkey = ngx.var.hostkey
+    if hostkey then
+        return hostkey
+    else
+        --location 中不配置hostkey时
+        return host
+    end
+end
 
-local k_divModname      = runtimeInfoLib .. ':' .. domainname .. 'divModulename'
-local k_divData         = runtimeInfoLib .. ':' .. domainname .. 'divDataKey'
-local k_userinfoModname = runtimeInfoLib .. ':' .. domainname .. 'userInfoModulename'
-local divModule, divPolicy, userInfoModname
+local getRuntime = function(database, hostname)
+    local runtimeMod = runtimeModule:new(database, runtimeLib)
+    return runtimeMod:get(hostname)
+end
 
-divModname      = sysConfig:get(k_divModname)
-divPolicy       = sysConfig:get(k_divData)
-userInfoModname = sysConfig:get(k_userinfoModname)
+local getUserInfo = function(runtime)
+    local userInfoModname = runtime[fields.userInfoModulename]
+    local userInfoMod     = require(userInfoModname)
+    local userInfo        = userInfoMod:get()
+    return userInfo
+end
 
---step 1: read from cache
-if areNULL(divModname, divPolicy, userInfoModname) then
--- setp 2: acquire the lock
-    local opts = {["timeout"] = tonumber(cache_expire)}
-    local lock = resty_lock:new(rt_cache_lock, opts)
-    local elapsed, err = lock:lock(userInfo)
-    if not elapsed then
+local getUpstream = function(runtime, database, userInfo)
+    local divModname = runtime[fields.divModulename]
+    local policy     = runtime[fields.divDataKey]
+    local divMod     = require(divModname)
+    local divModule  = divMod:new(database, policy)
+    local upstream   = divModule:getUpstream(userInfo) 
+
+    return upstream
+end
+
+local connectdb = function(red, redisConf)
+    if not red then
+        red = redisModule:new(redisConf)
+    end
+    local ok, err = red:connectdb()
+    if not ok then
+        local info = ERRORINFO.REDIS_CONNECT_ERROR
+        dolog(info, err)
+        return false, err
+    end
+
+    return ok, red
+end
+
+local hostname = getHost()
+if not hostname then
+    local info = ERRORINFO.ARG_BLANK_ERROR
+    local desc = 'cannot get [Host] from req headers'
+    dolog(info, desc, getRewriteInfo())
+    return nil
+end
+
+local log = logmod:new(hostname)
+
+local red = redisModule:new(redisConf)
+
+-- getRuntimeInfo from cache or db
+local pfunc = function()
+    local runtimeCache  = cache:new(ngx.var.sysConfig)
+
+    --step 1: read frome cache, but error
+    local divsteps = runtimeCache:getSteps(hostname)
+    if not divsteps then
+        -- continue, then fetch from db
+    elseif divsteps < 1 then
+        -- divsteps = 0, div switch off, goto default upstream
+        return false, 'divsteps < 1, div switchoff' 
+    else
+     -- divsteps fetched from cache, then get Runtime From Cache
+        local ok, runtimegroup = runtimeCache:getRuntime(hostname, divsteps)
+        if ok then
+            return true, divsteps, runtimegroup
+        -- else fetch from db
+        end
+    end
+
+    --step 2: acquire the lock
+    local sem, err = sema:wait(0.01)
+    if not sem then
+        -- lock failed acquired
+        -- but go on. This action just sets a fence 
+    end
+
+    -- setp 3: read from cache again
+    local divsteps = runtimeCache:getSteps(hostname)
+    if not divsteps then
+        -- continue, then fetch from db
+    elseif divsteps < 1 then
+        -- divsteps = 0, div switch off, goto default upstream
+        if sem then sema:post(1) end
+        return false, 'divsteps < 1, div switchoff' 
+    else
+     -- divsteps fetched from cache, then get Runtime From Cache
+        local ok, runtimegroup = runtimeCache:getRuntime(hostname, divsteps)
+        if ok then
+            if sem then sema:post(1) end
+            return true, divsteps, runtimegroup
+        -- else fetch from db
+        end
+    end
+
+    -- step 4: fetch from redis
+    local ok, db = connectdb(red, redisConf)
+    if not ok then 
+        if sem then sema:post(1) end
+		return ok, db
+    end
+
+    local database      = db.redis
+    local runtimeInfo   = getRuntime(database, hostname)
+
+    local divsteps		= runtimeInfo.divsteps
+    local runtimegroup	= runtimeInfo.runtimegroup
+
+    runtimeCache:setRuntime(hostname, divsteps, runtimegroup)
+    if red then setKeepalive(red) end
+
+    if sem then sema:post(1) end
+    return true, divsteps, runtimegroup
+end
+
+local ok, status, steps, runtimeInfo = xpcall(pfunc, handler)
+if not ok then
+    -- execute error, the type of status is table now
+    log:errlog("getruntime\t", "error\t")
+    return doerror(status, getRewriteInfo())
+else
+	local info = 'getRuntimeInfo error: '
+	if not status or not steps or steps < 1 then
+		if not status then
+			local reason = steps
+			if reason then
+				info = info .. reason
+			end
+		elseif not steps then
+			info = info .. 'no divsteps, div switch OFF'
+		elseif steps < 1 then
+			info = info .. 'divsteps < 1, div switch OFF'
+		end
+		return log:info(doredirect(info))
+	else
+		log:debug('divstep = ', steps, 
+					'\truntimeinfo = ', cjson.encode(runtimeInfo))
+	end
+end
+
+local divsteps      = steps
+local runtimegroup  = runtimeInfo
+
+local pfunc = function()
+
+    local upstreamCache = cache:new(ngx.var.kv_upstream)
+
+    local usertable = {}
+    for i = 1, divsteps do
+        local idx = indices[i]
+        local runtime = runtimegroup[idx]
+        local info = getUserInfo(runtime)
+
+        if info and info ~= '' then
+            usertable[idx] = info
+        end
+    end
+
+	log:debug('userinfo\t', cjson.encode(usertable))
+
+
+--  usertable is empty, it seems that will never happen
+--    if not next(usertable) then
+--        return nil 
+--    end
+
+    --step 1: read frome cache, but error
+    local upstable = upstreamCache:getUpstream(divsteps, usertable)
+	log:debug('first fetch: upstable in cache\t', cjson.encode(upstable))
+    for i = 1, divsteps do
+        local idx = indices[i]
+        local ups = upstable[idx]
+        if ups == -1 then
+			if i == divsteps then
+				local info = "usertable has no upstream in cache 1, \
+										proxypass to default upstream"
+				log:info(info)
+				return nil, info
+			end
+            -- continue
+        elseif ups == nil then
+			-- why to break
+			-- the reason is that maybe some userinfo is empty
+			-- 举例子,用户请求 
+			-- location/div -H 'X-Log-Uid:39' -H 'X-Real-IP:192.168.1.1'
+			-- 分流后缓存中 39->-1, 192.168.1.1-> beta2
+			-- 下一请求：
+			-- location/div?city=BJ -H 'X-Log-Uid:39' -H 'X-Real-IP:192.168.1.1'
+			-- 该请求应该是  39-> -1, BJ->beta1, 192.168.1.1->beta2，
+			-- 然而cache中是 39->-1, 192.168.1.1->beta2，
+			-- 如果此分支不break的话，将会分流到beta2上，这是错误的。
+			
+            break
+        else
+			local info = "get upstream ["..ups.."] according to ["
+							..idx.."] userinfo ["..usertable[idx].."] in cache 1"
+			log:info(info)
+            return ups, info
+        end
+    end
+
+    --step 2: acquire the lock
+    local sem, err = upsSema:wait(0.01)
+    if not sem then
         -- lock failed acquired
         -- but go on. This action just set a fence for all but this request
     end
-    
-    -- setp 3: read from cache again
-    divModname      = sysConfig:get(k_divModname)
-    divPolicy       = sysConfig:get(k_divData)
-    userInfoModname = sysConfig:get(k_userinfoModname)
 
-    if areNULL(divModname, divPolicy, userInfoModname) then
-    	-- step 4: fetch from redis
-        if not red then
-            red = redisModule:new(redisConf)
-            local ok, err = red:connectdb()
-            if not ok then
-                local errinfo = ERRORINFO.REDIS_CONNECT_ERROR
-                dolog(errinfo, err, getRewriteInfo())
-                local ok, err = lock:unlock()
-                return
+    -- setp 3: read from cache again
+    local upstable = upstreamCache:getUpstream(divsteps, usertable)
+	log:debug('second fetch: upstable in cache\t', cjson.encode(upstable))
+    for i = 1, divsteps do
+        local idx = indices[i]
+        local ups = upstable[idx]
+        if ups == -1 then
+            -- continue
+			if i == divsteps then
+				local info = "usertable has no upstream in cache 2, \
+										proxypass to default upstream"
+				return nil, info
+			end
+
+        elseif ups == nil then
+			-- do not break, may be the next one will be okay
+             break
+        else
+            if sem then upsSema:post(1) end
+			local info = "get upstream ["..ups.."] according to ["
+							..idx.."] userinfo ["..usertable[idx].."] in cache 2"
+            return ups, info
+        end
+    end
+
+    -- step 4: fetch from redis
+    local ok, db = connectdb(red, redisConf)
+    if not ok then
+        if sem then upsSema:post(1) end
+		return nil, db
+    end
+    local database = db.redis
+
+    for i = 1, divsteps do
+        local idx = indices[i]
+        local runtime = runtimegroup[idx]
+        local info = usertable[idx]
+
+        if info then
+            local upstream = getUpstream(runtime, database, info)
+            if not upstream then
+                upstreamCache:setUpstream(info, -1)
+				log:debug('fetch userinfo [', info, '] from db, get [nil]')
+            else
+                if sem then upsSema:post(1) end
+                if red then setKeepalive(red) end
+
+                upstreamCache:setUpstream(info, upstream)
+				log:debug('fetch userinfo [', info, '] from db, get [', upstream, ']')
+
+				local info = "get upstream ["..upstream.."] according to ["
+									..idx.."] userinfo ["..usertable[idx].."] in db"
+                return upstream, info
             end
         end
-    
-    	local pfunc = function() 
-            local runtimeMod    =  runtimeModule:new(red.redis, runtimeInfoLib)
-            local runtimeInfo   =  runtimeMod:get(domainname)
-            return runtimeInfo
-    	end
-    	local status, info = xpcall(pfunc, handler)
-    	if not status then
-            local errinfo  = info[1]
-            local errstack = info[2] 
-            local err, desc = errinfo[1], errinfo[2]
-            dolog(err, desc, getRewriteInfo(), errstack)
-            local ok, err = lock:unlock()
-            return
-    	end
-    
-    	divModname      = info[1]
-    	divPolicy       = info[2]
-    	userInfoModname = info[3]
-    
-    	if areNULL(divModname, divPolicy, userInfoModname) then
-            local errinfo = ERRORINFO.RUNTIME_BLANK_ERROR
-            local errdesc = 'runtimeInfo blank'
-            
-            sysConfig:set(k_divModname, -1, shdict_expire)
-            sysConfig:set(k_divData, -1, shdict_expire)
-            sysConfig:set(k_userinfoModname, -1, shdict_expire)
-            local ok, err = lock:unlock()
-            
-            if red then setKeepalive(red) end
-                dolog(errinfo, errdesc, getRewriteInfo())
-            return
-    	else
-            sysConfig:set(k_divModname, divModname, shdict_expire)
-            sysConfig:set(k_divData, divPolicy, shdict_expire)
-            sysConfig:set(k_userinfoModname, userInfoModname, shdict_expire)
-            local ok, err = lock:unlock()
-    	end
     end
 
-elseif isSwitchOff(divModname, divPolicy, userInfoModname) then
-    -- switchoff, so goto default upstream
-    doredirect()
-    return
+    if sem then upsSema:post(1) end
+    if red then setKeepalive(red) end
+    return nil, 'the req has no target upstream'
+end
+
+local status, info, desc = xpcall(pfunc, handler)
+if not status then
+    doerror(info)
 else
-    -- maybe userful
-end
-
---====================================================
---准备工作:
---		分流模块		divModule
---		用户特征提取模块	userInfoModule
---获取用户信息:
---		用户信息		userInfo
-local userInfoMod
-local diversionMod
-local userInfo
-
-local pfunc = function()
-    userInfoMod  = require(userInfoModname)
-    diversionMod = require(divModname)
-    userInfo = userInfoMod:get()
-end
-local ok, info = xpcall(pfunc, handler)
-if not ok then
-    local errinfo   = info[1]
-    local errstack  = info[2] 
-    local err, desc = errinfo[1], errinfo[2]
-    dolog(err, desc, getRewriteInfo(), errstack)
-    if red then setKeepalive(red) end
-    return
-end
-
-if not userInfo then
-    local errinfo = ERRORINFO.USERINFO_BLANK_ERROR
-    local errdesc = userInfoModulename
-    dolog(errinfo, errdesc, getRewriteInfo())
-    if red then setKeepalive(red) end
-    return
-end
-------------------分流准备工作结束--------------------
---====================================================
-
-local upstream, err = kv_upstream:get(userInfo)
-if not upstream then
-
-    if not red then
-        red = redisModule:new(redisConf)
-        local ok, err = red:connectdb()
-        if not ok then
-            local errinfo = ERRORINFO.REDIS_CONNECT_ERROR
-            dolog(errinfo, err, getRewriteInfo())
-            return
-        end
-    end
-    
-    local pfunc = function()
-        local divModule = diversionMod:new(red.redis, divPolicy)
-        local upstream  = divModule:getUpstream(userInfo) 
-        return upstream
-    end
-    local status, backend = xpcall(pfunc, handler)
-    if not status then
-        local info      = backend
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        dolog(err, desc, getRewriteInfo(), errstack)
-        return
-    end
-    
-    upstream = backend
+    upstream = info
 end
 
 if upstream then
     ngx.var.backend = upstream
-else
-    upstream = default_backend
 end
 
-kv_upstream:set(userInfo, upstream, shdict_expire)
-doredirect()
---------------------分流结果结束----------------------
---====================================================
-
---====================================================
----------------------后续处理-------------------------
----如果本次请求使用过redis,设置redis对象的keepalive---
-------------------------------------------------------
-if red then
-    setKeepalive(red)
-end
-
+local info = doredirect(desc)
+log:errlog(info)

@@ -14,11 +14,13 @@ local redisModule   = require('abtesting.utils.redis')
 local systemConf    = require('abtesting.utils.init')
 local handler       = require('abtesting.error.handler').handler
 local utils         = require('abtesting.utils.utils')
+local log			= require('abtesting.utils.log')
 local ERRORINFO     = require('abtesting.error.errcode').info
 
 local cjson         = require('cjson.safe')
 local doresp        = utils.doresp
 local dolog         = utils.dolog
+local doerror       = utils.doerror
 
 local redisConf     = systemConf.redisConf
 local divtypes      = systemConf.divtypes
@@ -27,72 +29,18 @@ local policyLib     = prefixConf.policyLibPrefix
 local runtimeLib    = prefixConf.runtimeInfoPrefix
 local domain_name   = prefixConf.domainname
 
-
-
 local getPolicyId = function()
-    local policyID      = ngx.var.arg_policyid
+    local policyID = tonumber(ngx.var.arg_policyid)
 
-    if policyID then
-        policyID = tonumber(ngx.var.arg_policyid)
-        if not policyID or policyID < 0 then
-            local info = ERRORINFO.PARAMETER_TYPE_ERROR 
-            local desc = "policyID should be a positive Integer"
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil 
-        end
+    if not policyID or policyID < 0 then
+        local info = ERRORINFO.PARAMETER_TYPE_ERROR 
+        local desc = "policyID invalid"
+        local response = doresp(info, desc)
+        log:errlog(dolog(info, desc))
+        ngx.say(response)
+        return nil 
     end
-
-    if not policyID then
-        local request_body  = ngx.var.request_body
-        local postData      = cjson.decode(request_body)
-
-        if not request_body then
-            -- ERRORCODE.PARAMETER_NONE
-            local info = ERRORINFO.PARAMETER_NONE 
-            local desc = 'request_body or post data to get policyID'
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil 
-        end
-
-        if not postData then
-            -- ERRORCODE.PARAMETER_ERROR
-            local info = ERRORINFO.PARAMETER_ERROR 
-            local desc = 'postData is not a json string'
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil 
-        end
-
-        policyID = postData.policyid
-
-        if not policyID then
-            local info = ERRORINFO.PARAMETER_ERROR 
-            local desc = "policyID is needed"
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil
-        end
-
-        policyID = tonumber(postData.policyid)
-
-        if not policyID or policyID < 0 then
-            local info = ERRORINFO.PARAMETER_TYPE_ERROR 
-            local desc = "policyID should be a positive Integer"
-            local response = doresp(info, desc)
-            dolog(info, desc)
-            ngx.say(response)
-            return nil
-        end
-    end
-
     return policyID
-
 end
 
 local getPolicy = function()
@@ -105,7 +53,7 @@ local getPolicy = function()
         local errinfo   = ERRORINFO.PARAMETER_NONE
         local desc      = 'request_body or post data'
         local response  = doresp(errinfo, desc)
-        dolog(errinfo, desc)
+        log:errlog(dolog(errinfo, desc))
         ngx.say(response)
         return nil
     end
@@ -115,7 +63,8 @@ local getPolicy = function()
         local errinfo   = ERRORINFO.PARAMETER_ERROR 
         local desc      = 'postData is not a json string'
         local response  = doresp(errinfo, desc)
-        dolog(errinfo, desc)
+
+        log:errlog(dolog(errinfo, desc))
         ngx.say(response)
         return nil
     end
@@ -128,7 +77,7 @@ local getPolicy = function()
         local errinfo   = ERRORINFO.PARAMETER_NONE 
         local desc      = "policy divtype or policy divdata"
         local response  = doresp(errinfo, desc)
-        dolog(errinfo, desc)
+        log:errlog(dolog(errinfo, desc))
         ngx.say(response)
         return nil
     end
@@ -138,7 +87,7 @@ local getPolicy = function()
         local errinfo   = ERRORINFO.PARAMETER_TYPE_ERROR 
         local desc      = "unsupported divtype"
         local response  = doresp(errinfo, desc)
-        dolog(errinfo, desc)
+        log:errlog(dolog(errinfo, desc))
         ngx.say(response)
         return nil
     end
@@ -162,11 +111,7 @@ _M.check = function(option)
 
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
@@ -178,7 +123,8 @@ _M.check = function(option)
 
     local response
     if not valid then
-        dolog(err, desc)
+
+        log:errlog(dolog(err, desc))
         response = doresp(err, desc)
     else
         response = doresp(ERRORINFO.SUCCESS)
@@ -203,11 +149,7 @@ _M.set = function(option)
 
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo  = info[1]
-        local errstack = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response	= doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
@@ -218,7 +160,7 @@ _M.set = function(option)
     local desc      = chkout[3]
 
     if not valid then
-        dolog(err, desc)
+        log:errlog(dolog(err, desc))
         local response = doresp(err, desc)
         ngx.say(response)
         return false
@@ -227,15 +169,10 @@ _M.set = function(option)
     local pfunc = function() return policyMod:set(policy) end
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
-
     local data
     if info then
         data = ' the id of new policy is '..info
@@ -262,15 +199,11 @@ _M.del = function(option)
 
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+
+        local response = doerror(info)
         ngx.say(response)
         return false
     end
-
     local response = doresp(ERRORINFO.SUCCESS)
     ngx.say(response)
     return true
@@ -291,16 +224,12 @@ _M.get = function(option)
 
     local status, info = xpcall(pfunc, handler)
     if not status then
-        local errinfo   = info[1]
-        local errstack  = info[2] 
-        local err, desc = errinfo[1], errinfo[2]
-        local response  = doresp(err, desc)
-        dolog(err, desc, nil, errstack)
+        local response = doerror(info)
         ngx.say(response)
         return false
     else
         local response = doresp(ERRORINFO.SUCCESS, nil, info)
-        dolog(ERRORINFO.SUCCESS, nil)
+        log:errlog(dolog(ERRORINFO.SUCCESS, nil))
         ngx.say(response)
         return true
     end

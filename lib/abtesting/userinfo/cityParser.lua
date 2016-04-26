@@ -5,7 +5,6 @@ local _M = {
 
 _M.get = function()
 	local u = ngx.var.arg_city
-    ngx.log(ngx.ERR, u)
 	return u
 end
 return _M
