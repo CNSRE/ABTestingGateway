@@ -63,7 +63,6 @@ local getPolicy = function()
         local errinfo   = ERRORINFO.PARAMETER_ERROR 
         local desc      = 'postData is not a json string'
         local response  = doresp(errinfo, desc)
-
         log:errlog(dolog(errinfo, desc))
         ngx.say(response)
         return nil
@@ -123,7 +122,6 @@ _M.check = function(option)
 
     local response
     if not valid then
-
         log:errlog(dolog(err, desc))
         response = doresp(err, desc)
     else
@@ -199,7 +197,6 @@ _M.del = function(option)
 
     local status, info = xpcall(pfunc, handler)
     if not status then
-
         local response = doerror(info)
         ngx.say(response)
         return false

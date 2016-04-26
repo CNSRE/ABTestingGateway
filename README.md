@@ -6,7 +6,7 @@
 
 * nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，查找出目标upstream，进而实现分流。
 
-* ABTestingGateway 是新浪微博内部的动态路由系统 dygateway 的一部分，主要功能是：
+* ABTestingGateway 是新浪微博内部的动态路由系统 dygateway 的一部分，因此本文档中的 dygateway 主要是指其子功能 ABTestingGateway。主要功能是：
 
 ab功能简介
 -------------------

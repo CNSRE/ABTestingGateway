@@ -24,7 +24,6 @@ local runtimeLib    = prefixConf.runtimeInfoPrefix
 local policyLib     = prefixConf.policyLibPrefix
 local domain_name   = prefixConf.domainname
 local divtypes      = systemConf.divtypes
-
 local fields        = systemConf.fields
 
 local runtimeGroupModule = require('abtesting.adapter.runtimegroup')
@@ -229,9 +228,12 @@ _M.runtimeset = function(option, policyId)
         return false
     end
 
+
     local response = doresp(ERRORINFO.SUCCESS)
     ngx.say(response)
     return true
 end
+
+
 
 return _M
