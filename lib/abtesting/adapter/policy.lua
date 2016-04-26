@@ -6,10 +6,14 @@ local modulename = "abtestingAdapterPolicy"
 local _M = { _VERSION = "0.0.1" }
 local mt = { __index = _M }
 
-local ERRORINFO = require('abtesting.error.errcode').info
-local fields    = require('abtesting.utils.init').fields
+local ERRORINFO	= require('abtesting.error.errcode').info
 
 local separator = ':'
+local fields = {}
+fields.divtype = 'divtype'
+fields.divdata = 'divdata'
+fields.idCount = 'idCount'
+
 ---
 -- policyIO new function
 -- @param database opened redis.
@@ -103,10 +107,10 @@ end
 -- @param id the policy identify
 -- @return allways returned SUCCESS
 _M.del = function(self, id)
-    local database      = self.database
-    local baseLibrary   = self.baseLibrary
+    local database = self.database
 
-    local policyLib = baseLibrary .. ':' .. id 
+    local policyLib = table.concat({self.baseLibrary, id}, separator)
+	ngx.log(ngx.ERR, policyLib)
 
     local keys, err = database:keys(policyLib..'*')
     if not keys then
