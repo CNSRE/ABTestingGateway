@@ -14,3 +14,4 @@ t/servroot/
 
 *stdout
 
+*.log

@@ -1,18 +1,12 @@
 
-动态路由系统
+基于动态策略的灰度发布系统
 =========================
 
-* 动态路由系统 dygateway 主要由灰度发布系统ABTestingGateway（简称ab功能）和动态upstream member系统（简称dyups功能）组成，用于在7层上实现动态调度。     
+* ABTestingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于nginx和ngx-lua开发，使用 redis 作为分流策略数据库，可以实现动态调度功能。
 
-* 实现的方式是:
-    * ab功能决定将用户请求转发到哪个upstream
-    * dyups功能统决定upstream里有哪些member
-        * dyups可以运行时添加upstream
-        * dyups可以在运行时向upstream内部添加server。
-    * 通过两个子系统的合作，dygateway实现了动态调度功能。 
+* nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，查找出目标upstream，进而实现分流。
 
-
-* 在介绍系统部署方法前，有必要对动态路由系统的各个功能做一定介绍:
+* ABTestingGateway 是新浪微博内部的动态路由系统 dygateway 的一部分，主要功能是：
 
 ab功能简介
 -------------------
@@ -25,23 +19,11 @@ ab功能简介
 
 详细解释参见： [ab分流功能须知](doc/ab功能须知.md)
 
-dyups功能简介
-----------------------
-
-对于dyups功能而言，主要有如下功能：
-
-1. 修改upstream的server列表，动态增减其中的server，设置权重等参数，无需重启系统
-1. 动态增加或删除upstream，
-1. 对upstream或server列表的修改，都会触发dump事件，将修改后的结果重新覆盖upstream.conf
-1. 目前支持从redis中以pub/sub方式获取指令，实现集群。
-
 系统部署
 =========================
 
 安装过程
 -------------------
-
-dygateway的软件包都在我们的软件仓库中,地址是 http://repos.sina.cn/custom-repos/mweibo/6/dygateway/ 
 
 详见：[dygateway部署过程](doc/dygateway部署过程.md)
 
@@ -51,8 +33,6 @@ dygateway的软件包都在我们的软件仓库中,地址是 http://repos.sina.
 [nginx.conf配置过程](doc/nginx_conf_配置过程.md)  
 
 [redis.conf配置过程](doc/redis_conf_配置过程.md)  
-
-[dyupsc模块的初始化配置](doc/dyupsc模块的初始化配置.md)
 
 
 系统使用
@@ -97,45 +77,8 @@ ab功能接口
     /ab_admin?action=runtime_del
 ```
 
-
-dyupsc功能接口
-------------------
-
-* [dyupsc功能接口说明文档](doc/dyupsc功能接口使用介绍.md) 
-
-```bash
-
-    * 动态增删指定upstream中的server.
-    /dyupsc_admin?action=remove_server
-    /dyupsc_admin?action=remove_peer
-
-    * 动态增删upstream.
-    /dyupsc_admin?action=remove_upstream
-
-    * 动态修改upstream中server的weight值.
-    /dyupsc_admin?action=set_peer_weight
-    
-    * 动态修改upstream中server的 状态down or up.
-        * 修改后端peer的max_fails值
-        * 修改后端peer的fail_timeout值
-    /dyupsc_admin?action=set_peer_down
-
-    * 查看upstream中的信息: 
-        * 查看upstream列表.
-        * 查看upstream中server的列表.
-        * 只查看后备服务器列表.
-    /dyupsc_admin?action=get_upstreams
-    /dyupsc_admin?action=get_primary_peers
-    /dyupsc_admin?action=get_backup_peers
-```
-
 TODO LIST
 ----------------------------
-
-* dyupsc与ab的互动
-    * 设置运行时策略时，检查策略中的upstream是否存在
-    * 删除upstream时，检测运行时策略中该upstream是否存在
-    * dyupsc与ab共享utils，共享init
 
 * ab提供提供交互界面管理接口
     * 获取系统中所有策略、策略组

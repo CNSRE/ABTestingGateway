@@ -29,11 +29,6 @@ dygateway配置文件结构示意
             location ab_admin {
             
             }
-
-            # dynamic upstream管理接口
-            location dyupsc_admin {
-            
-            }
     }
 ```
 
@@ -72,33 +67,12 @@ nginx配置过程
 lua_code_cache on;
 
 #lua代码的路径
-lua_package_path "/usr/local/dygateway/luacode/ab/?.lua;/usr/local/dygateway/luacode/ab/lib/?.lua;/usr/local/dygateway/luacode/ab/lib/lua-resty-core/lib/?.lua;/usr/local/dygateway/luacode/dyupsc/?.lua;;";
+lua_package_path "/usr/local/dygateway/luacode/ab/?.lua;/usr/local/dygateway/luacode/ab/lib/?.lua;/usr/local/dygateway/luacode/ab/lib/lua-resty-core/lib/?.lua;;";
 
 #ngx_lua获取post数据配置
 lua_need_request_body on;
 
-#dyupsc所需的配置
-lua_shared_dict dyupsc 5m;
-lua_shared_dict pull_lock 1m;
-lua_shared_dict dump_lock 1m;
-init_worker_by_lua_file '/usr/local/dygateway/luacode/init//init_process_timer.lua';
-
-# dygateway的upstream配置文件，这个路径非常重要，dyups将nginx的upstream情况dump到这个文件中。
-include /etc/nginx/ups/upstream.conf;
 ```
-* 注：
-    * 关于 /etc/nginx/ups/upstream.conf，该文件和所在目录的权限因为777，使得nobody用户可读可写!!!
-
-    ```lua
-    -- 在dyups的lua代码中，dygateway/luacode/dyupsc/utils/init.lua中
-    
-    _M.dumpConf = { 
-        -- dump_path is dump runtime nginx upstream conf and save to $dump_path.
-        ["dump_path"]        = '/etc/nginx/ups/upstream.conf',
-    }
-    
-    -- dump_path 要与nginx.conf中一致
-    ```
 
 * ***Step*** 2.  在管理server的server配置块内添加：
 
@@ -116,16 +90,6 @@ set $redis_keepalive_timeout 90000;    --(连接池keepalive_time, in ms)
 # ab管理功能配置
 location = /ab_admin {
     content_by_lua_file '/usr/local/dygateway/luacode/ab/admin/ab_action.lua';
-}
-
-# 模块要求需要有这个配置，虽然不美观，但是需要加上
-location /fake_location{
-    dyups_interface;
-}
-
-# dyups管理功能配置
-location = /dyupsc_admin {
-    content_by_lua_file '/usr/local/dygateway/luacode/dyupsc/admin/dyupstream_action.lua';
 }
 
 ```
@@ -178,7 +142,6 @@ server {
 
         rewrite_by_lua_file '/usr/local/dygateway/luacode/ab/diversion/diversion.lua';
 
-        # http后跟着的必须是一个变量，以$开头的变量。否则dyups功能失效
         proxy_pass http://$backend;
     }
  
