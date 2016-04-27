@@ -1,6 +1,10 @@
 ab分流功能须知
 -------------------
 
+转发分流是灰度系统的主要功能，目前 ABTestingGateway 支持 `ip段分流(iprange)`、`uid用户段分流(uidrange)`、`uid尾数分流(uidsuffix)` 和 `指定特殊uid分流(uidappoint)` 四种方式。
+
+ABTestingGateway 依据系统中配置的 `运行时信息runtimeInfo` 进行分流工作；通过将 runtimeInfo 设置为不同的分流策略，实现运行时分流策略的动态更新，达到动态调度的目的。
+
 对于ab功能而言，步骤是以下三步：
 
 1. 向系统添加策略，将策略写入策略数据库中
@@ -34,6 +38,7 @@ ab分流功能须知
     /ab_admin?action=runtime_set&policyid=0&hostname=xxx.weibo.cn
 
 向hostname=xxx.weibo.cn设置运行时信息，完全是在访问runtime_set接口时的hostname参数中指定的。   
+
 因此，如果引入location级别的运行时信息，我们只需要在调用runtime_set接口时指定hostname就可以。这个hostname同时在location中指定，比如对location /abc设置分流信息时，hostname指定为xxx.weibo.cn.abc，这样在对访问/abc接口的请求进行分流时，以xxx.weibo.cn.abc为key的分流信息生效（例如 ab:test:runtiemInfo:xxx.weibo.cn.abc:divModulename）。具体配置方法见下文
 
 ###  3. 对用户请求进行分流 ###
@@ -43,8 +48,13 @@ ab分流功能须知
 2. 用户信息提取模块userInfoModule提取用户信息userInfo
 3. 分流模块divmodule根据分流策略divDataKey和userInfo计算得到对应的upstream，转发；如果没有对应的upstream，则转向默认upstream。
 
-在引入location级别的分流设置后，需要对访问同一个servername的不同location进行甄别，这里将第一步中从用户请求中获取
-HOST字段，改为在location配置块中预先设置HOST字段，其效果是一样的。
+* 分流三要素的用途
+    <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/runtime_policy.png" ></div>
+
+* 分流过程流程图
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/div_flowchart.png"><p>分流过程流程图</p></div>
+
+在引入location级别的分流设置后，需要对访问同一个servername的不同location进行甄别，这里将第一步中从用户请求中获取HOST字段，改为在location配置块中预先设置HOST字段，其效果是一样的。
 
 ```bash
 	curl http://ip:port/abc?city=BJ -H 'X-Uid:30' -H 'Host:whatever'

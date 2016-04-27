@@ -32,7 +32,6 @@ Features:
 
 - new feature: ***支持多级分流***
 
-
 灰度发布系统功能简介
 -------------------
 
@@ -55,6 +54,48 @@ Features:
 * LuaJIT	(可以从openresty软件包中获取最新版本)
 * lua-cjson (可以从openresty软件包中获取最新版本)
 * redis-2.8.19
+
+how to start
+-----------------------
+repo中的`utils/conf`文件夹中有灰度系统部署所需的最小示例
+
+```bash
+1. git clone https://github.com/SinaMSRE/ABTestingGateway
+2. cd /path/to/ABTestingGateway/utils
+
+# 启动redis数据库
+3. redis-server conf/redis.conf 
+
+# 启动upstream server，其中stable为默认upstream
+4. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/stable.conf
+5. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta1.conf
+6. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta2.conf
+7. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta3.conf
+8. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta4.conf
+
+# 启动灰度系统，proxy server，灰度系统的配置也写在conf/nginx.conf中
+9. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/nginx.conf
+
+# 简单验证：添加分流策略组
+$ curl 127.0.0.1:8080/ab_admin?action=policygroup_set -d '{"1":{"divtype":"uidsuffix","divdata":[{"suffix":"1","upstream":"beta1"},{"suffix":"3","upstream":"beta2"},{"suffix":"5","upstream":"beta1"},{"suffix":"0","upstream":"beta3"}]},"2":{"divtype":"arg_city","divdata":[{"city":"BJ","upstream":"beta1"},{"city":"SH","upstream":"beta2"},{"city":"XA","upstream":"beta1"},{"city":"HZ","upstream":"beta3"}]},"3":{"divtype":"iprange","divdata":[{"range":{"start":1111,"end":2222},"upstream":"beta1"},{"range":{"start":3333,"end":4444},"upstream":"beta2"},{"range":{"start":7777,"end":2130706433},"upstream":"beta2"}]}}'
+
+{"desc":"success ","code":200,"data":{"groupid":0,"group":[0,1,2]}}
+
+# 简单验证：设置运行时策略
+
+$ curl "127.0.0.1:8030/ab_admin?action=runtime_set&hostname=api.weibo.cn&policygroupid=0"
+
+# 分流
+$ curl 127.0.0.1:8030 -H 'X-Uid:39' -H 'X-Real-IP:192.168.1.1'
+this is stable server
+
+$ curl 127.0.0.1:8030 -H 'X-Uid:30' -H 'X-Real-IP:192.168.1.1'
+this is beta3 server
+
+$ curl 127.0.0.1:8030/?city=BJ -H 'X-Uid:39' -H 'X-Real-IP:192.168.1.1'
+this is beta1 server
+
+```
 
 配置过程
 ------------------------
@@ -124,6 +165,26 @@ proxy server的硬件配置：
 - CPU：E5620 2.4GHz 16核
 - Mem：24GB
 - Nic：千兆网卡，多队列，理论流量峰值为125MB/s
+
+压测结果：
+-----------
+
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_line.png"><p>压测环境下灰度系统与原生nginx转发的对比图</p></div>
+
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_data.png"><p>压测环境下灰度系统与原生nginx转发的数据对比</p></div>
+
+如图所示，用户请求完全命中cache是理想中的情况，灰度系统在理想情况下可以达到十分接近原生nginx转发的性能。
+
+产生图中压测结果的场景是：用户请求经过proxy server转向upstream server，访问1KB大小的静态文件。
+
+proxy server的硬件配置：
+
+- CPU：E5620 2.4GHz 16核
+- Mem：24GB
+- Nic：千兆网卡，多队列，理论流量峰值为125MB/s
+
+* 注：压测结果是单级分流模式的压力测试结果，多级压测与单级压测的数据像差不多，因为ngx_lua的执行时间仅占ab功能的小部分，瓶颈不在于此
+
 
 线上部署简图：
 -----------
