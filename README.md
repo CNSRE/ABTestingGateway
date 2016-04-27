@@ -166,23 +166,6 @@ proxy server的硬件配置：
 - Mem：24GB
 - Nic：千兆网卡，多队列，理论流量峰值为125MB/s
 
-压测结果：
------------
-
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_line.png"><p>压测环境下灰度系统与原生nginx转发的对比图</p></div>
-
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_data.png"><p>压测环境下灰度系统与原生nginx转发的数据对比</p></div>
-
-如图所示，用户请求完全命中cache是理想中的情况，灰度系统在理想情况下可以达到十分接近原生nginx转发的性能。
-
-产生图中压测结果的场景是：用户请求经过proxy server转向upstream server，访问1KB大小的静态文件。
-
-proxy server的硬件配置：
-
-- CPU：E5620 2.4GHz 16核
-- Mem：24GB
-- Nic：千兆网卡，多队列，理论流量峰值为125MB/s
-
 * 注：压测结果是单级分流模式的压力测试结果，多级压测与单级压测的数据像差不多，因为ngx_lua的执行时间仅占ab功能的小部分，瓶颈不在于此
 
 
