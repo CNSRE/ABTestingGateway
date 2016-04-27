@@ -8,6 +8,30 @@
 
 * ABTestingGateway 是新浪微博内部的动态路由系统 dygateway 的一部分，因此本文档中的 dygateway 主要是指其子功能 ABTestingGateway。动态路由系统dygateway目前应用于手机微博7层、微博头条等产品线。
 
+在以往的基于 nginx 实现的灰度系统中，分流逻辑往往通过 rewrite 阶段的 if 和 rewrite 指令等实现，优点是`性能较高`，缺点是`功能受限`、`容易出错`，以及`转发规则固定，只能静态分流`。针对这些缺点，我们设计实现了ABTestingGateway，采用 ngx-lua 实现系统功能，通过启用[lua-shared-dict](http://wiki.nginx.org/HttpLuaModule#ngx.shared.DICT)和[lua-resty-lock](https://github.com/openresty/lua-resty-lock)作为系统缓存和缓存锁，系统获得了较为接近原生nginx转发的性能。
+
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="70%" height="70%"><p>ABTestingGateway 的架构简图</p></div>
+
+如果在使用过程中有任何问题，欢迎大家来吐槽，一起完善、一起提高、一起使用！
+
+email: bg2bkk@gmail.com  open.hfc@gmail.com
+
+压测数据：[压测报告](https://github.com/WEIBOMSRE/ABTestingGateway/blob/master/doc/%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83%E7%B3%BB%E7%BB%9F%E5%8E%8B%E6%B5%8B%E6%8A%A5%E5%91%8A.pdf)
+
+项目演讲：[演讲文档](https://github.com/WEIBOMSRE/ABTestingGateway/blob/master/doc/%E5%9F%BA%E4%BA%8E%E5%8A%A8%E6%80%81%E7%AD%96%E7%95%A5%E7%9A%84%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83%E7%B3%BB%E7%BB%9F.pdf)
+
+Features:
+----------
+
+- 支持多种分流方式，目前包括iprange、uidrange、uid尾数和指定uid分流
+- 动态设置分流策略，即时生效，无需重启
+- 可扩展性，提供了开发框架，开发者可以灵活添加新的分流方式，实现二次开发
+- 高性能，压测数据接近原生nginx转发
+- 灰度系统配置写在nginx配置文件中，方便管理员配置
+- 适用于多种场景：灰度发布、AB测试和负载均衡等
+
+- new feature: ***支持多级分流***
+
 
 灰度发布系统功能简介
 -------------------
@@ -83,6 +107,28 @@ ab功能接口
     /ab_admin?action=runtime_set
     /ab_admin?action=runtime_del
 ```
+
+压测结果：
+-----------
+
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_line.png"><p>压测环境下灰度系统与原生nginx转发的对比图</p></div>
+
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_data.png"><p>压测环境下灰度系统与原生nginx转发的数据对比</p></div>
+
+如图所示，用户请求完全命中cache是理想中的情况，灰度系统在理想情况下可以达到十分接近原生nginx转发的性能。
+
+产生图中压测结果的场景是：用户请求经过proxy server转向upstream server，访问1KB大小的静态文件。
+
+proxy server的硬件配置：
+
+- CPU：E5620 2.4GHz 16核
+- Mem：24GB
+- Nic：千兆网卡，多队列，理论流量峰值为125MB/s
+
+线上部署简图：
+-----------
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/deployment.png"></div>
+
 
 TODO LIST
 ----------------------------
