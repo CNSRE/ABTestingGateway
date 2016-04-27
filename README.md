@@ -6,9 +6,10 @@
 
 * nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，查找出目标upstream，进而实现分流。
 
-* ABTestingGateway 是新浪微博内部的动态路由系统 dygateway 的一部分，因此本文档中的 dygateway 主要是指其子功能 ABTestingGateway。主要功能是：
+* ABTestingGateway 是新浪微博内部的动态路由系统 dygateway 的一部分，因此本文档中的 dygateway 主要是指其子功能 ABTestingGateway。动态路由系统dygateway目前应用于手机微博7层、微博头条等产品线。
 
-ab功能简介
+
+灰度发布系统功能简介
 -------------------
 
 对于ab功能而言，步骤是以下三步：
@@ -22,13 +23,19 @@ ab功能简介
 系统部署
 =========================
 
-安装过程
--------------------
+软件依赖
+------------------
 
-详见：[dygateway部署过程](doc/dygateway部署过程.md)
+* tengine or openresty
+* ngx_lua	(可以从openresty软件包中获取最新版本)
+* LuaJIT	(可以从openresty软件包中获取最新版本)
+* lua-cjson (可以从openresty软件包中获取最新版本)
+* redis-2.8.19
 
 配置过程
 ------------------------
+
+* 由于内部部署时以dygateway项目名部署，因此下文中的所有配置，都应将ABTestingGateway文件夹重命名为dygateway
 
 [nginx.conf配置过程](doc/nginx_conf_配置过程.md)  
 
