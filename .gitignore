@@ -12,6 +12,6 @@ t/servroot/
 *.sh
 *.pyc
 
-*stdout
+*stdout*
 
 *.log

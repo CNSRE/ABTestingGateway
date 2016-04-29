@@ -35,13 +35,18 @@ Features:
 灰度发布系统功能简介
 -------------------
 
-对于ab功能而言，步骤是以下三步：
+对于ab管理功能而言，步骤是以下三步：
 
 1. 向系统添加策略，将策略写入策略数据库中
 1. 为具体的server设置运行时信息，将某个分流策略设置为运行时策略
 1. 之后可以进行分流操作
 
 详细解释参见： [ab分流功能须知](doc/ab功能须知.md)
+
+对于ab分流功能而言，分流流程图如图所示
+
+<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/div_flowchart.png"><p>分流过程流程图</p></div>
+
 
 系统部署
 =========================
@@ -83,7 +88,7 @@ $ curl 127.0.0.1:8080/ab_admin?action=policygroup_set -d '{"1":{"divtype":"uidsu
 
 # 简单验证：设置运行时策略
 
-$ curl "127.0.0.1:8030/ab_admin?action=runtime_set&hostname=api.weibo.cn&policygroupid=0"
+$ curl "127.0.0.1:8080/ab_admin?action=runtime_set&hostname=api.weibo.cn&policygroupid=0"
 
 # 分流
 $ curl 127.0.0.1:8030 -H 'X-Uid:39' -H 'X-Real-IP:192.168.1.1'
