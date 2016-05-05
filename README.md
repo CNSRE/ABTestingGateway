@@ -182,13 +182,41 @@ proxy server的硬件配置：
 TODO LIST
 ----------------------------
 
-* ab提供提供交互界面管理接口
-    * 获取系统中所有策略、策略组
+* 开发nginx shm storage模块，扩展 ngx-shared-dict 的功能
+	* 目前 ngx-shared-dict 提供高效快速的 kv 式简单存储
+	* 简单高效的存储，不足之处最直接的体现在不支持缓存 lua table。[lua-resty-lrucache提供LuaVM级别的缓存，不能跨worker共享]
+	* 目前团队同学基于红黑树实现了类似于ngx-shared-dict的存储功能，可以存储任意类型，查找方式由用户自定义。项目地址：[ngx-shared-rbtree](https://github.com/helloyi/ngx-lua-shrbtree-module)
+	* ngx-shared-rbtree的不足之处在于“模块只能存储一颗红黑树”，不能实现复杂用法，因此需要被进一步扩展。类似于如下所示的使用方法：
 
-* ab的策略增加name字段，用于识别和操作name
+```bash
 
-* ab去cache策略
+local dict = ngx.shared.ngxdb
+-----------------------------------
 
-* dyupsc增加部分接口：keepalive字段等
+local db_tab = "db_tab"
+local k_tab = {["a"]=1, ["b"]=2}
+local v_tab = {1, 2, 3}
 
-* 每次的修改操作能够写在日志里记录起来
+dict:set(db_tab, k_tab, v_tab)
+
+local v_tab = dict:get(db_tab, k_tab)
+-----------------------------------
+
+local db_kv = "db_kv"
+local k = "foo"
+local v = "bar"
+
+dict:set(db_kv, k, v)
+
+local getv = dict:get(db_kv, v)
+-----------------------------------
+```
+* 扩展ABTestingGateway的功能
+	* 由于该项目最初是为手机微博7层开发的，所以只关注了分流功能。
+	* 而项目在公司内部使用过程中发现，不同业务对于ab项目这层转发工作的期许不太一样
+	* 有的业务需要将用户分流到不同的服务器上
+	* 有的业务需要在这步处理中根据策略增减用户请求的uri参数或者header头
+	* 所以扩展ab项目的这层转发很有必要，目前随着在公司内部的推广，也在不停的收集需求，探索新的玩法
+	* 其实整个AB项目并没有太高的技术含量，大家关于ab和分流的玩法都大同小异，所不同的是，我们在这种范式下，能发出多少有趣的花样，期待大家多多交流
+
+* 逐步开源dygateway的所有功能
