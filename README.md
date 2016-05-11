@@ -64,6 +64,8 @@ how to start
 -----------------------
 repo中的`utils/conf`文件夹中有灰度系统部署所需的最小示例
 
+> 目前repo的master分支是支持多级分流的版本，如果只想体验单级分流，可以fork single_diversion_release分支，具体文档都在相关分支的readme中。
+
 ```bash
 1. git clone https://github.com/SinaMSRE/ABTestingGateway
 2. cd /path/to/ABTestingGateway/utils
