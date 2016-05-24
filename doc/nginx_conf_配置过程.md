@@ -50,7 +50,7 @@ dygateway配置文件结构示意
             set $sysConfig      abc_sysConfig;
             set $kv_upstream    kv_abc_upstream;
 
-            set $backend    'default_upstream'';
+            set $backend    'default_upstream';
             rewrite_by_lua_file "luacode/ab/diversion.lua";
             proxy_pass http://$backend;
         }
