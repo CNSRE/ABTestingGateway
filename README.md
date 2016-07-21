@@ -54,7 +54,7 @@ Features:
 软件依赖
 ------------------
 
-* tengine or openresty
+* openresty or tengine
 * ngx_lua	(可以从openresty软件包中获取最新版本)
 * LuaJIT	(可以从openresty软件包中获取最新版本)
 * lua-cjson (可以从openresty软件包中获取最新版本)
@@ -180,6 +180,14 @@ proxy server的硬件配置：
 -----------
 <div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/deployment.png"></div>
 
+FAQ
+-------------------------------
+
+* 启动时报错，[提示ngx_http_lua_ffi_semaphore_new未定义](https://github.com/CNSRE/ABTestingGateway/issues/27)
+	* 这个是ngx_lua比较新的版本中带有的 resty.semaphore模块，请确定ngx_lua版本包含该模块
+	* LuaJIT也请采用openresty软件包中提供的版本
+	* 其实直接采用openresty最好，使用最新版本的openresty不会用软件依赖问题，只是我所在的项目组有tengine的需求，所以用tengine
+* 为什么都root用户了还会提示Permission denied, [solution](https://github.com/CNSRE/ABTestingGateway/issues/28)
 
 TODO LIST
 ----------------------------
