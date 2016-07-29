@@ -13,5 +13,6 @@ t/servroot/
 *.pyc
 
 *stdout*
+stdout
 
 *.log
