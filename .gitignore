@@ -2,7 +2,7 @@
 *.o
 *.swp
 *_temp/
-*logs/
+*.log
 *.log
 *.pid
 *.out
