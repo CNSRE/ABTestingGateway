@@ -9,7 +9,6 @@
 *.rdb
 t/servroot/
 *temp/
-*.sh
 *.pyc
 
 *stdout*
