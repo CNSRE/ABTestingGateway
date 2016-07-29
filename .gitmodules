@@ -1,3 +1,0 @@
-[submodule "lib/lua-resty-core"]
-	path = lib/lua-resty-core
-	url = https://github.com/openresty/lua-resty-core
