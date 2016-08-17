@@ -41,8 +41,6 @@ dyups功能简介
 安装过程
 -------------------
 
-dygateway的软件包都在我们的软件仓库中,地址是 http://repos.sina.cn/custom-repos/mweibo/6/dygateway/ 
-
 详见：[dygateway部署过程](doc/dygateway部署过程.md)
 
 配置过程
