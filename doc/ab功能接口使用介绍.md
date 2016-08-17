@@ -97,7 +97,7 @@ ab管理接口
         * 参数：policyid: 设置第policyid号策略为运行时策略
         * 参数：hostname：非常重要，向server api.weibo.cn绑定运行时信息，或向location /abc @server api.weibo.cn绑定运行时信息
         * 返回值：{"code":200,"desc":"success "}
-        * 注意：设置运行时信息的动作会导致原来数据库中的运行时信息删除，不论本次设置是否成功
+        * 注意：设置运行时信息的动作前会删除先数据库中的运行时信息删除，如果输入策略正确，则不论本次设置是否成功，都会删除之前的运行时信息
 
 * 10.设置***策略组***为系统的运行时策略，进行多级分流
     * http://localhost:port/ab_admin?action=runtime_set&policygroupid=4&hostname=api.weibo.cn

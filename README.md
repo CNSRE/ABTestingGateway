@@ -1,38 +1,20 @@
 
-基于动态策略的灰度发布系统
+动态路由系统
 =========================
 
-* ABTestingGateway 是一个可以动态设置分流策略的灰度发布系统，工作在7层，基于nginx和ngx-lua开发，使用 redis 作为分流策略数据库，可以实现动态调度功能。
+* 动态路由系统 dygateway 主要由灰度发布系统ABTestingGateway（简称ab功能）和动态upstream member系统（简称dyups功能）组成，用于在7层上实现动态调度。     
 
-* nginx是目前使用较多的7层服务器，可以实现高性能的转发和响应；ABTestingGateway 是在 nginx 转发的框架内，在转向 upstream 前，根据 用户请求特征 和 系统的分流策略 ，查找出目标upstream，进而实现分流。
+* 实现的方式是:
+    * ab功能决定将用户请求转发到哪个upstream
+    * dyups功能统决定upstream里有哪些member
+        * dyups可以运行时添加upstream
+        * dyups可以在运行时向upstream内部添加server。
+    * 通过两个子系统的合作，dygateway实现了动态调度功能。 
 
-* ABTestingGateway 是新浪微博内部的动态路由系统 dygateway 的一部分，因此本文档中的 dygateway 主要是指其子功能 ABTestingGateway。动态路由系统dygateway目前应用于手机微博7层、微博头条等产品线。
 
-在以往的基于 nginx 实现的灰度系统中，分流逻辑往往通过 rewrite 阶段的 if 和 rewrite 指令等实现，优点是`性能较高`，缺点是`功能受限`、`容易出错`，以及`转发规则固定，只能静态分流`。针对这些缺点，我们设计实现了ABTestingGateway，采用 ngx-lua 实现系统功能，通过启用[lua-shared-dict](http://wiki.nginx.org/HttpLuaModule#ngx.shared.DICT)和[lua-resty-lock](https://github.com/openresty/lua-resty-lock)作为系统缓存和缓存锁，系统获得了较为接近原生nginx转发的性能。
+* 在介绍系统部署方法前，有必要对动态路由系统的各个功能做一定介绍:
 
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/abtesting_architect.png" width="70%" height="70%"><p>ABTestingGateway 的架构简图</p></div>
-
-如果在使用过程中有任何问题，欢迎大家来吐槽，一起完善、一起提高、一起使用！
-
-email: bg2bkk@gmail.com  open.hfc@gmail.com
-
-压测数据：[压测报告](https://github.com/WEIBOMSRE/ABTestingGateway/blob/master/doc/%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83%E7%B3%BB%E7%BB%9F%E5%8E%8B%E6%B5%8B%E6%8A%A5%E5%91%8A.pdf)
-
-项目演讲：[演讲文档](https://github.com/WEIBOMSRE/ABTestingGateway/blob/master/doc/%E5%9F%BA%E4%BA%8E%E5%8A%A8%E6%80%81%E7%AD%96%E7%95%A5%E7%9A%84%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83%E7%B3%BB%E7%BB%9F.pdf)
-
-Features:
-----------
-
-- 支持多种分流方式，目前包括iprange、uidrange、uid尾数和指定uid分流
-- 动态设置分流策略，即时生效，无需重启
-- 可扩展性，提供了开发框架，开发者可以灵活添加新的分流方式，实现二次开发
-- 高性能，压测数据接近原生nginx转发
-- 灰度系统配置写在nginx配置文件中，方便管理员配置
-- 适用于多种场景：灰度发布、AB测试和负载均衡等
-
-- new feature: ***支持多级分流***
-
-灰度发布系统功能简介
+ab功能简介
 -------------------
 
 对于ab功能而言，步骤是以下三步：
@@ -43,68 +25,34 @@ Features:
 
 详细解释参见： [ab分流功能须知](doc/ab功能须知.md)
 
+dyups功能简介
+----------------------
+
+对于dyups功能而言，主要有如下功能：
+
+1. 修改upstream的server列表，动态增减其中的server，设置权重等参数，无需重启系统
+1. 动态增加或删除upstream，
+1. 对upstream或server列表的修改，都会触发dump事件，将修改后的结果重新覆盖upstream.conf
+1. 目前支持从redis中以pub/sub方式获取指令，实现集群。
+
 系统部署
 =========================
 
-软件依赖
-------------------
+安装过程
+-------------------
 
-* tengine or openresty
-* ngx_lua	(可以从openresty软件包中获取最新版本)
-* LuaJIT	(可以从openresty软件包中获取最新版本)
-* lua-cjson (可以从openresty软件包中获取最新版本)
-* redis-2.8.19
+dygateway的软件包都在我们的软件仓库中,地址是 http://repos.sina.cn/custom-repos/mweibo/6/dygateway/ 
 
-how to start
------------------------
-repo中的`utils/conf`文件夹中有灰度系统部署所需的最小示例
-
-```bash
-1. git clone https://github.com/SinaMSRE/ABTestingGateway
-2. cd /path/to/ABTestingGateway/utils
-
-# 启动redis数据库
-3. redis-server conf/redis.conf 
-
-# 启动upstream server，其中stable为默认upstream
-4. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/stable.conf
-5. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta1.conf
-6. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta2.conf
-7. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta3.conf
-8. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/beta4.conf
-
-# 启动灰度系统，proxy server，灰度系统的配置也写在conf/nginx.conf中
-9. /usr/local/nginx/sbin/nginx -p `pwd` -c conf/nginx.conf
-
-# 简单验证：添加分流策略组
-$ curl 127.0.0.1:8080/ab_admin?action=policygroup_set -d '{"1":{"divtype":"uidsuffix","divdata":[{"suffix":"1","upstream":"beta1"},{"suffix":"3","upstream":"beta2"},{"suffix":"5","upstream":"beta1"},{"suffix":"0","upstream":"beta3"}]},"2":{"divtype":"arg_city","divdata":[{"city":"BJ","upstream":"beta1"},{"city":"SH","upstream":"beta2"},{"city":"XA","upstream":"beta1"},{"city":"HZ","upstream":"beta3"}]},"3":{"divtype":"iprange","divdata":[{"range":{"start":1111,"end":2222},"upstream":"beta1"},{"range":{"start":3333,"end":4444},"upstream":"beta2"},{"range":{"start":7777,"end":2130706433},"upstream":"beta2"}]}}'
-
-{"desc":"success ","code":200,"data":{"groupid":0,"group":[0,1,2]}}
-
-# 简单验证：设置运行时策略
-
-$ curl "127.0.0.1:8030/ab_admin?action=runtime_set&hostname=api.weibo.cn&policygroupid=0"
-
-# 分流
-$ curl 127.0.0.1:8030 -H 'X-Uid:39' -H 'X-Real-IP:192.168.1.1'
-this is stable server
-
-$ curl 127.0.0.1:8030 -H 'X-Uid:30' -H 'X-Real-IP:192.168.1.1'
-this is beta3 server
-
-$ curl 127.0.0.1:8030/?city=BJ -H 'X-Uid:39' -H 'X-Real-IP:192.168.1.1'
-this is beta1 server
-
-```
+详见：[dygateway部署过程](doc/dygateway部署过程.md)
 
 配置过程
 ------------------------
 
-* 由于内部部署时以dygateway项目名部署，因此下文中的所有配置，都应将ABTestingGateway文件夹重命名为dygateway
-
 [nginx.conf配置过程](doc/nginx_conf_配置过程.md)  
 
 [redis.conf配置过程](doc/redis_conf_配置过程.md)  
+
+[dyupsc模块的初始化配置](doc/dyupsc模块的初始化配置.md)
 
 
 系统使用
@@ -149,33 +97,45 @@ ab功能接口
     /ab_admin?action=runtime_del
 ```
 
-压测结果：
------------
 
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_line.png"><p>压测环境下灰度系统与原生nginx转发的对比图</p></div>
+dyupsc功能接口
+------------------
 
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/load_data.png"><p>压测环境下灰度系统与原生nginx转发的数据对比</p></div>
+* [dyupsc功能接口说明文档](doc/dyupsc功能接口使用介绍.md) 
 
-如图所示，用户请求完全命中cache是理想中的情况，灰度系统在理想情况下可以达到十分接近原生nginx转发的性能。
+```bash
 
-产生图中压测结果的场景是：用户请求经过proxy server转向upstream server，访问1KB大小的静态文件。
+    * 动态增删指定upstream中的server.
+    /dyupsc_admin?action=remove_server
+    /dyupsc_admin?action=remove_peer
 
-proxy server的硬件配置：
+    * 动态增删upstream.
+    /dyupsc_admin?action=remove_upstream
 
-- CPU：E5620 2.4GHz 16核
-- Mem：24GB
-- Nic：千兆网卡，多队列，理论流量峰值为125MB/s
+    * 动态修改upstream中server的weight值.
+    /dyupsc_admin?action=set_peer_weight
+    
+    * 动态修改upstream中server的 状态down or up.
+        * 修改后端peer的max_fails值
+        * 修改后端peer的fail_timeout值
+    /dyupsc_admin?action=set_peer_down
 
-* 注：压测结果是单级分流模式的压力测试结果，多级压测与单级压测的数据像差不多，因为ngx_lua的执行时间仅占ab功能的小部分，瓶颈不在于此
-
-
-线上部署简图：
------------
-<div align="center"><img src="https://raw.githubusercontent.com/SinaMSRE/ABTestingGateway/master/doc/img/deployment.png"></div>
-
+    * 查看upstream中的信息: 
+        * 查看upstream列表.
+        * 查看upstream中server的列表.
+        * 只查看后备服务器列表.
+    /dyupsc_admin?action=get_upstreams
+    /dyupsc_admin?action=get_primary_peers
+    /dyupsc_admin?action=get_backup_peers
+```
 
 TODO LIST
 ----------------------------
+
+* dyupsc与ab的互动
+    * 设置运行时策略时，检查策略中的upstream是否存在
+    * 删除upstream时，检测运行时策略中该upstream是否存在
+    * dyupsc与ab共享utils，共享init
 
 * ab提供提供交互界面管理接口
     * 获取系统中所有策略、策略组

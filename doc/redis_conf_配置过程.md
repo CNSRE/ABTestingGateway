@@ -1,3 +1,4 @@
+* 由于是单点部署，所以redis配置与我们以往线上配置一样就可以。    
 * redis的ip&port配置要与nginx.conf中一致，同时补充几点redis的优化配置
 
 

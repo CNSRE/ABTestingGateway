@@ -1,0 +1,39 @@
+curl http://127.0.0.1:8030/ab_admin?action=policy_set -d '{"divtype":"uidsuffix","divdata":[{"suffix":"1","upstream":"beta1"},{"suffix":"3","upstream":"beta2"},{"suffix":"5","upstream":"beta1"},{"suffix":"0","upstream":"beta3"}]}'
+
+curl "127.0.0.1:8030/ab_admin?action=policy_get&policyid=0"
+
+curl 127.0.0.1:8030/ab_admin?action=policy_set -d '{"divtype":"iprange","divdata":[{"range":{"start":1111,"end":2222},"upstream":"beta1"},{"range":{"start":3333,"end":4444},"upstream":"beta2"},{"range":{"start":7777,"end":8888},"upstream":"beta3"}]}'
+
+curl 127.0.0.1:8030/ab_admin?action=policygroup_check -d '{"2":{"divtype":"iprange","divdata":[{"range":{"start":1111,"end":2222},"upstream":"beta1"},{"range":{"start":3333,"end":4444},"upstream":"beta2"},{"range":{"start":7777,"end":8888},"upstream":"beta3"}]}, "1":{"divtype":"uidsuffix","divdata":[{"suffix":"1","upstream":"beta1"},{"suffix":"3","upstream":"beta2"},{"suffix":"5","upstream":"beta1"},{"suffix":"0","upstream":"beta3"}]}}'
+
+curl 127.0.0.1:8030/ -H 'Host:api.weibo.cn' -H 'X-Uid:39'
+
+curl 127.0.0.1:8030/ab_admin?action=policygroup_set -d '{"2":{"divtype":"iprange","divdata":[{"range":{"start":1111,"end":2222},"upstream":"beta1"},{"range":{"start":3333,"end":4444},"upstream":"beta2"},{"range":{"start":7777,"end":2130706433},"upstream":"beta3"}]}, "1":{"divtype":"uidsuffix","divdata":[{"suffix":"1","upstream":"beta1"},{"suffix":"3","upstream":"beta2"},{"suffix":"5","upstream":"beta1"},{"suffix":"0","upstream":"beta3"}]}}'
+
+curl 127.0.0.1:8030/ab_admin?action=policygroup_set -d '{"2":{"divtype":"iprange","divdata":[{"range":{"start":1111,"end":2222},"upstream":"beta1"},{"range":{"start":3333,"end":4444},"upstream":"beta2"},{"range":{"start":7777,"end":2130706433},"upstream":"beta2"}]}, "1":{"divtype":"uidsuffix","divdata":[{"suffix":"1","upstream":"beta1"},{"suffix":"3","upstream":"beta2"},{"suffix":"5","upstream":"beta1"},{"suffix":"0","upstream":"beta3"}]}}'
+
+curl "127.0.0.1:8030/ab_admin?action=runtimegroup_set&policygroupid=6&hostname=api.weibo.cn"
+
+curl  "127.0.0.1:8030/ab_admin?action=runtimegroup_get&hostname=api.weibo.cn"
+
+curl  "127.0.0.1:8030/ab_admin?action=runtimegroup_del&hostname=api.weibo.cn"
+
+curl 127.0.0.1:8030 -H 'Host:api.weibo.cn' -H 'X-Uid:39'
+curl 127.0.0.1:8030 -H 'Host:api.weibo.cn' -H 'X-Uid:39' -H 'X-Real-IP:192.168.1.1'
+
+curl 127.0.0.1:8030/ab_admin?action=policy_check -d '{"divtype":"arg_city","divdata":[{"city":"BJ","upstream":"beta1"},{"city":"SH","upstream":"beta2"},{"city":"XA","upstream":"beta1"},{"city":"HZ","upstream":"beta3"}]}'
+
+curl 127.0.0.1:8030/ab_admin?action=policygroup_set -d '{"1":{"divtype":"uidsuffix","divdata":[{"suffix":"1","upstream":"beta1"},{"suffix":"3","upstream":"beta2"},{"suffix":"5","upstream":"beta1"},{"suffix":"0","upstream":"beta3"}]},"2":{"divtype":"arg_city","divdata":[{"city":"BJ","upstream":"beta1"},{"city":"SH","upstream":"beta2"},{"city":"XA","upstream":"beta1"},{"city":"HZ","upstream":"beta3"}]},"3":{"divtype":"iprange","divdata":[{"range":{"start":1111,"end":2222},"upstream":"beta1"},{"range":{"start":3333,"end":4444},"upstream":"beta2"},{"range":{"start":7777,"end":2130706433},"upstream":"beta2"}]}}'
+
+curl "127.0.0.1:8030/ab_admin?action=runtime_set&hostname=api.weibo.cn&policygroupid=1"
+
+curl 127.0.0.1:8030/?city=BJ -H 'Host:api.weibo.cn' -H 'X-Uid:39' -H 'X-Real-IP:192.168.1.1'
+
+curl  "127.0.0.1:8030/ab_admin?action=runtime_get&hostname=api.weibo.cn"
+
+curl "127.0.0.1:8080/ab_admin?action=runtime_get&hostname=api.weibo.cn" | jq .
+curl "127.0.0.1:8080/ab_admin?action=runtime_get&hostname=api.weibo.cn.abc" | jq .
+
+curl 127.0.0.1:8030/ab_admin?action=action_policy_set -d '{"1":{"acttype":"uidappoint","actdata":[{"uidset":[1234,5124,653],"action":{"header_set":["k1","v1"],"header_del":["kn"]}},{"uidset":[3214,652,145],"action":{"arg_set":["k3","v3"],"arg_del":["km"]}}]},"2":{"acttype":"uidsuffix","actdata":[{"suffix":3,"action":{"header_set":["k5","v6"],"header_del":["kn"]}},{"suffix":5,"action":{"arg_set":["k6","v6"],"arg_del":["km"]}}]}}'
+
+curl 127.0.0.1:8030/ab_admin?action=action_policy_set -d '{"1":{"acttype":"uidrange","actdata":[{"range":{"start":1111,"end":2222},"action":{"header_set":["k1","v1"],"header_del":["kn"]}},{"range":{"start":3333,"end":4444},"action":{"arg_set":["k3","v3"],"arg_del":["km"]}}]},"2":{"acttype":"uidsuffix","actdata":[{"suffix":3,"action":{"header_set":["k5","v6"],"header_del":["kn"]}},{"suffix":5,"action":{"arg_set":["k6","v6"],"arg_del":["km"]}}]}}'
