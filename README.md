@@ -72,7 +72,7 @@ repo中的`utils/conf`文件夹中有灰度系统部署所需的最小示例
 
 ```bash
 1. git clone https://github.com/SinaMSRE/ABTestingGateway
-2. cd /path/to/ABTestingGateway/utils
+2. cd /path/to/ABTestingGateway/utils && mkdir logs
 
 # 启动redis数据库
 3. redis-server conf/redis.conf 
