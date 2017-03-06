@@ -60,7 +60,7 @@ Features:
 * lua-cjson 
 * redis
 
-> > 注意：建议选用openresty最新版，但是从openresty-1.9.15.1开始，lua-resty-core有些api变更，因此建议先使用openresty-1.9.7.5及以下，原因是：[必读](https://github.com/CNSRE/ABTestingGateway/issues/27#issuecomment-236149255)
+> > 注意：建议选用openresty最新版，但是从openresty-1.9.15.1开始，lua-resty-core有些api变更，因此建议先使用openresty-1.9.7.5，原因是：[必读](https://github.com/CNSRE/ABTestingGateway/issues/27#issuecomment-236149255)
 
 > > 注意：tengine用户仍然可以使用本项目，只需要从openresty软件包中获取最新的ngx_lua、LuaJIT以及lua-cjson等，并注意：[必读](https://github.com/CNSRE/ABTestingGateway/issues/27#issuecomment-236149255) 
 
