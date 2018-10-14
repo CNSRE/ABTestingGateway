@@ -106,7 +106,7 @@ _M.del = function(self, id)
     local database      = self.database
     local baseLibrary   = self.baseLibrary
 
-    local policyLib = baseLibrary .. ':' .. id 
+    local policyLib = baseLibrary .. ':' .. id .. ':'
 
     local keys, err = database:keys(policyLib..'*')
     if not keys then
